@@ -1,0 +1,18 @@
+--- src/ld/passes/bitcode_bundle.cpp.orig	2022-08-06 23:26:15.000000000 +0200
++++ src/ld/passes/bitcode_bundle.cpp	2022-08-06 23:26:37.000000000 +0200
+@@ -131,8 +131,14 @@
+ protected:
+     void initFile() {
+         if (!_file_buffer) {
+-            if (xar_extract_tobuffersz(_parent, _xar_file, &_file_buffer, &_file_size) != 0)
++            if (xar_extract_tobuffer(_parent, _xar_file, &_file_buffer) != 0)
+                 throwf("could not extract files from bitcode bundle");
++
++            const char *sizestr = NULL;
++            if(xar_prop_get(_xar_file, "data/size", &sizestr) != 0)
++                throwf("could not extract file size from bitcode bundle");
++
++            _file_size = strtoull(sizestr, (char **)NULL, 10);
+         }
+     }
+     void destroyFile() {

@@ -201,6 +201,8 @@ subport ld64-274 {
 }
 
 subport ld64-latest {
+    PortGroup legacysupport 1.1
+
     # Xcode 10.2
     version 450.3
     set makefile        "Makefile-450"
@@ -225,14 +227,24 @@ subport ld64-latest {
         ld64-409-add-missing-machine-defs.diff \
         ld64-409-options-disable-i386-warning.diff \
         ld64-450-move-baseplatform-def-to-header.diff \
+        ld64-450-xar-compatibility.diff
 
     depends_lib-append port:libcxx port:libtapi
     configure.cxx_stdlib libc++
     configure.cxxflags-append -std=c++11
 
+    if { ${os.platform} eq "darwin" && ${os.major} <= 9 } {
+        depends_lib-append          port:libblocksruntime
+        configure.cxxflags-append   -fblocks
+        configure.ldflags-append    -lBlocksRuntime
+    }
+
     # silence some warnings
     configure.cxxflags-append -Wno-deprecated-declarations
     configure.cxxflags-append -Wno-parentheses-equality
+
+    # Avoid `error: unknown type name 'uuid_string_t'`
+    legacysupport.newest_darwin_requires_legacy 9
 
     supported_archs i386 x86_64
 }
@@ -259,14 +271,6 @@ if {${subport} eq ${name}} {
     if {![variant_isset ld64_97] && ![variant_isset ld64_127] && ![variant_isset ld64_236] && ![variant_isset ld64_274] && ![variant_isset ld64_xcode]} {
         if {${os.major} < 9} {
             default_variants +ld64_97
-        } elseif {${os.major} < 11} {
-            # os versions < 11 can't build newer ld64 versions with their stock xcode compilers
-            # so need to call in clang-9.0 and that has a runtime dep on ld64 (circular)
-            default_variants +ld64_127
-        } elseif {${os.major} < 15} {
-            # os versions < 16 can't build libtapi or newer ld64 versions with their stock xcode compilers
-            # so need to call in clang-9.0 and that has a runtime dep on ld64 (circular)
-            default_variants +ld64_274
         } elseif {${os.major} == 15} {
             # darwin15's Xcode 8.2.1 comes with ld64-274 with TAPI support (which ours doesn't have)
             # darwin15 can't build libtapi with the default toolchain. The SDK needs TAPI,
@@ -332,11 +336,6 @@ if {${subport} eq ${name}} {
 
     depends_build       path:include/mach-o/arm/reloc.h:libmacho-headers
 
-    if {[string match macports-clang-* ${configure.compiler}]} {
-        # For a new enough install_name_tool
-        depends_build-append port:cctools
-    }
-
     set all_llvm_variants {llvm50 llvm60 llvm70 llvm80 llvm90 llvmdev}
     if {${os.major} < 10} {
         lappend all_llvm_variants llvm33
@@ -350,6 +349,11 @@ if {${subport} eq ${name}} {
     array set llvm_variant_version {llvm33 3.3 llvm34 3.4 llvm37 3.7 llvm50 5.0 llvm60 6.0 llvm70 7.0 llvm80 8.0 llvm90 9.0 llvmdev devel}
     set llvm_version {}
 
+    variant bootstrap conflicts {*}${all_llvm_variants} description "Use clang-11-bootstrap for libLTO" {
+        depends_lib-append \
+                        port:clang-11-bootstrap
+    }
+
     foreach variantname $all_llvm_variants {
         set this_llvm_version $llvm_variant_version($variantname)
         variant $variantname conflicts {*}[ldelete $all_llvm_variants $variantname] description "Use llvm-${this_llvm_version} for libLTO" "
@@ -360,6 +364,9 @@ if {${subport} eq ${name}} {
 
     proc some_llvm_variant_set {} {
         global all_llvm_variants
+        if {[variant_isset bootstrap]} {
+            return yes
+        }
         foreach variantname $all_llvm_variants {
             if {[variant_isset $variantname]} {
                 return yes
@@ -374,14 +381,8 @@ if {${subport} eq ${name}} {
     # has been installed.
 
     if {![some_llvm_variant_set]} {
-        if {${os.major} == 12 || ${os.major} == 13} {
-            # Using llvm-3.7 to break a dependency cycle (https://trac.macports.org/ticket/53138)
-            default_variants +llvm37
-        } elseif {${os.major} == 10 || ${os.major} == 11} {
-            default_variants +llvm34
-        } elseif {${os.major} == 9} {
-            # Using llvm-3.3 to break dependency cycle (https://trac.macports.org/ticket/52091)
-            default_variants +llvm33
+        if { ${os.major} < 14 } {
+            default_variants +bootstrap
         }
 
         if {![some_llvm_variant_set] && ![variant_isset ld64_xcode] && ${os.major} >= 9} {
@@ -396,9 +397,17 @@ if {${subport} eq ${name}} {
         }
     }
 
-    if {${os.platform} eq "darwin" && ${os.major} < 11 && ${subport} eq "ld64-127" && [variant_isset llvm34]} {
-        # This port is used by clang-3.4 to bootstrap libcxx.
-        configure.cxx_stdlib    libstdc++
+    # For a new enough install_name_tool
+    if {[variant_isset bootstrap]} {
+        depends_build-append \
+                        port:cctools-bootstrap
+
+        configure.env   PATH=${prefix}/libexec/cctools-bootstrap/bin:$env(PATH)
+        build.env       PATH=${prefix}/libexec/cctools-bootstrap/bin:$env(PATH)
+        destroot.env    PATH=${prefix}/libexec/cctools-bootstrap/bin:$env(PATH)
+    } elseif {[string match macports-clang-* ${configure.compiler}]} {
+        depends_build-append \
+                        port:cctools
     }
 
     if {${os.major} < 10} {
@@ -407,6 +416,22 @@ if {${subport} eq ${name}} {
     }
 
     compiler.blacklist-append gcc-4.0
+
+    if {[variant_isset bootstrap]} {
+        configure.compiler.add_deps \
+                        no
+
+        depends_lib-append \
+                        port:clang-11-bootstrap
+
+        configure.cc    ${prefix}/libexec/clang-11-bootstrap/bin/clang
+        configure.cxx   ${prefix}/libexec/clang-11-bootstrap/bin/clang++
+
+        configure.cxxflags-append \
+                        -DTARGET_OS_OSX=1 \
+                        -DTARGET_OS_WATCH=0 \
+                        -DTARGET_OS_BRIDGE=0
+    }
 
     pre-fetch {
         if {${os.major} < 9} {
@@ -473,7 +498,7 @@ if {${subport} eq ${name}} {
 
         # On Leopard, we want to make sure we pick up our newer libunwind (in libc++abi.dylib) instead of the one in libgcc_s.10.5.dylib
         if {${configure.cxx_stdlib} eq "libc++"} {
-            configure.ldflags-append -lc++abi
+            configure.ldflags-append -lc++ -lc++abi
         }
     }
 
@@ -491,7 +516,9 @@ if {${subport} eq ${name}} {
         PREFIX=${prefix}
 
     pre-build {
-        if {${llvm_version} != ""} {
+        if {[variant_isset bootstrap]} {
+            build.args-append LLVM_CONFIG=${prefix}/libexec/clang-11-bootstrap/bin/llvm-config
+        } elseif {${llvm_version} != ""} {
             build.args-append LLVM_CONFIG=${prefix}/bin/llvm-config-mp-${llvm_version}
         }
 
