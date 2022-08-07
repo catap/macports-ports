@@ -8,9 +8,9 @@ name                    cctools
 # Xcode 11.3.1
 version                 949.0.1
 set ld64_version        530
-revision                2
+revision                3
 
-subport ${name}-bootstrap { revision 0 }
+subport ${name}-bootstrap { revision 1 }
 
 categories              devel
 platforms               darwin
@@ -122,32 +122,8 @@ if { ![some_llvm_variant_set] && ![variant_isset xcode] } {
     } elseif {${subport} eq "${name}-bootstrap"} {
         # enforce +bootstrap variant by default for bootstrap subport if xcode isn't new enough
         default_variants +bootstrap
-    } elseif {${os.major} >= 16} {
-        # llvm-11 changed the arguments accepted by llvm-objdump
-        # this causes a number of errors in scripts that still use the old arguments
-        # we will default to +llvm11 when xcode changes to require the new arguments
-        # see https://reviews.llvm.org/D92310 and https://trac.macports.org/ticket/61852
-        default_variants +llvm10
-    } elseif {${os.major} >= 14} {
-        # llvm-9.0 is the newest llvm the system toolchain can build on these systems
-        default_variants +llvm90
-    } elseif {${os.major} >= 12} {
-        # llvm-3.7 is the newest llvm the system toolchain can build on these systems
-        default_variants +llvm37
-    } elseif {${os.major} >= 10} {
-        # llvm-3.4 is the newest llvm the system toolchain can build on these systems
-        default_variants +llvm34
-    }
-
-    # we purposefully don't force an llvm variant on cctools for < darwin10
-    # to avoid a dependency loop. Folks who want LTO support on
-    # systems prior to darwin10 can reinstall cctools with an llvm variant manually
-    # see https://trac.macports.org/ticket/52091
-
-    # If a default llvm is still not set, use +llvm10
-    # this fail-safe ensures some cctools variant can build
-    if {![some_llvm_variant_set] && ![variant_isset xcode] && ${os.major} >= 10} {
-        default_variants +llvm10
+    } else {
+        default_variants +llvm11
     }
 }
 
