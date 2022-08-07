@@ -1,7 +1,6 @@
 # -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:filetype=tcl:et:sw=4:ts=4:sts=4
 
 PortSystem          1.0
-PortGroup           clang_dependency 1.0
 
 name                icu
 set my_name         icu4c
@@ -185,6 +184,48 @@ if {${subport} eq "${name}-doxygen-docs"} {
 
     replaced_by             ${name}-docs
 }
+
+# icu is used as part of bootstrap for old system
+# use bootstrap compilers to make things much faster
+if {${subport} eq ${name} && ${os.platform} eq "darwin" && ${os.major} < 18} {
+    if { (${os.major} < 11 || ${os.major} > 20) } {
+        depends_build-replace \
+                            port:python27 port:python27-bootstrap
+        depends_skip_archcheck-append \
+                            python27-bootstrap
+
+        configure.python    ${prefix}/libexec/python27-bootstrap/bin/python2.7
+    }
+
+    configure.compiler.add_deps \
+                            no
+
+    depends_build-append    port:gcc10-bootstrap
+    depends_skip_archcheck-append \
+                            gcc10-bootstrap
+
+    configure.cc            ${prefix}/libexec/gcc10-bootstrap/bin/gcc
+    configure.cxx           ${prefix}/libexec/gcc10-bootstrap/bin/g++
+
+    # prevent it from linking against gcc's libstdc++.6.dylib and libgcc_s.1.1.dylib
+    configure.ldflags-append \
+                            -static-libstdc++ -static-libgcc
+
+    if { ${os.major} < 10 } {
+        if {${configure.sdkroot} eq ""} {
+            configure.sdkroot "/"
+        }
+
+        post-extract {
+            file mkdir ${workpath}/bins
+
+            ln -s ${configure.sdkroot}/usr/bin/ld   ${workpath}/bins/ld
+        }
+
+        build.env-append    PATH=${workpath}/bins:$env(PATH)
+    }
+}
+
 
 if {${subport} eq ${name}} {
     livecheck.url       http://site.icu-project.org/download
