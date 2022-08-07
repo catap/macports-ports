@@ -275,6 +275,44 @@ if {[string match macports-clang-* ${configure.compiler}]} {
     depends_skip_archcheck-append cctools
 }
 
+# use clang-11-bootstrap as shortcut for macOS before 10.14
+if { ${os.platform} eq "darwin" && ${os.major} < 18 } {
+    configure.compiler.add_deps \
+                        no
+
+    depends_build-replace \
+                        path:bin/cmake:cmake port:cmake-bootstrap
+    depends_skip_archcheck-append \
+                        cmake-bootstrap
+    configure.cmd       ${prefix}/libexec/cmake-bootstrap/bin/cmake
+
+    depends_build-append \
+                        port:python27-bootstrap
+    depends_skip_archcheck-append \
+                        python27-bootstrap
+    configure.args-append \
+                        -DPYTHON_EXECUTABLE=${prefix}/libexec/python27-bootstrap/bin/python2.7
+
+    depends_build-delete \
+                        port:cctools
+    depends_build-append \
+                        port:cctools-bootstrap
+    depends_skip_archcheck-append \
+                        cctools-bootstrap
+    configure.args-append \
+                        -DCMAKE_LIBTOOL=${prefix}/libexec/cctools-bootstrap/bin/libtool
+
+    configure.compiler.add_deps \
+                        no
+
+    depends_build-append \
+                        port:clang-11-bootstrap
+    depends_skip_archcheck-append \
+                        clang-11-bootstrap
+    configure.cc        ${prefix}/libexec/clang-11-bootstrap/bin/clang
+    configure.cxx       ${prefix}/libexec/clang-11-bootstrap/bin/clang++
+}
+
 if {${os.major} <= 14} {
     # compiler-rt does a broad search for an SDK it likes, but this
     # search fails on older systems that don't have a MacOSX.sdk
@@ -289,9 +327,11 @@ if {[lsearch -exact $PortInfo(depends_build) port:cctools] != -1} {
         -DCMAKE_LIBTOOL=${prefix}/bin/libtool
 }
 
-depends_build-append    port:python310
-set pythonfullpath      ${prefix}/bin/python3.10
-configure.args-append   -D_Python3_EXECUTABLE=${pythonfullpath}
+if {[lsearch -exact $PortInfo(depends_build) port:python27-bootstrap] == -1} {
+    depends_build-append    port:python310
+    set pythonfullpath      ${prefix}/bin/python3.10
+    configure.args-append   -D_Python3_EXECUTABLE=${pythonfullpath}
+}
 
 platform darwin {
     # Note that we are forcing this choice.  This means that anything linking
