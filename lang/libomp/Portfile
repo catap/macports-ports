@@ -5,7 +5,6 @@ PortGroup               cmake 1.1
 if {${os.major} <= 17} {
     PortGroup           muniversal 1.0
 }
-PortGroup               clang_dependency 1.0
 PortGroup               compiler_blacklist_versions 1.0
 
 name                    libomp
@@ -93,6 +92,43 @@ compiler.blacklist-append {clang < 500} *gcc*
 
 if {${os.major} <= 17} {
     default_variants    +universal
+}
+
+# use clang-11-bootstrap as shortcut for macOS before 10.14
+if { ${os.platform} eq "darwin" && ${os.major} < 18 } {
+    configure.compiler.add_deps \
+                        no
+
+    depends_build-replace \
+                        path:bin/cmake:cmake port:cmake-bootstrap
+    depends_skip_archcheck-append \
+                        cmake-bootstrap
+    configure.cmd       ${prefix}/libexec/cmake-bootstrap/bin/cmake
+
+
+    depends_build-append \
+                        port:python27-bootstrap
+    depends_skip_archcheck-append \
+                        python27-bootstrap
+    configure.args-append \
+                        -DPYTHON_EXECUTABLE=${prefix}/libexec/python27-bootstrap/bin/python2.7
+
+    depends_build-append \
+                        port:cctools-bootstrap
+    depends_skip_archcheck-append \
+                        cctools-bootstrap
+    configure.args-append \
+                        -DCMAKE_LIBTOOL=${prefix}/libexec/cctools-bootstrap/bin/libtool
+
+    configure.compiler.add_deps \
+                        no
+
+    depends_build-append \
+                        port:clang-11-bootstrap
+    depends_skip_archcheck-append \
+                        clang-11-bootstrap
+    configure.cc        ${prefix}/libexec/clang-11-bootstrap/bin/clang
+    configure.cxx       ${prefix}/libexec/clang-11-bootstrap/bin/clang++
 }
 
 # Do actual install into ${prefix}/(install|lib)/libomp
