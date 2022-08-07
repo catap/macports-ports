@@ -189,7 +189,7 @@ variant stdlib_flag description {Enable stdlib command line flag to select c++ r
     # which is then used as the default search location when `-stdlib=libc++`
     # is given. Therefore to have consistency across various OS versions, and to enable
     # modern c++ standards, use a recent macports clang port to provide this.
-    if { ${os.platform} eq "darwin" && ${os.major} < 11 } {
+    if { ${os.platform} eq "darwin" && ${os.major} < 18 } {
         set mp_clang_ver 11
     } else {
         set mp_clang_ver 14
@@ -199,7 +199,11 @@ variant stdlib_flag description {Enable stdlib command line flag to select c++ r
     }
     configure.args-append --with-gxx-libcxx-include-dir="${prefix}/libexec/llvm-${mp_clang_ver}/include/c++/v1"
 }
-default_variants-append +stdlib_flag
+
+# libcxx is untested on PPC
+if {${build_arch} ni [list ppc ppc64]} {
+    default_variants-append +stdlib_flag
+}
 
 # https://trac.macports.org/ticket/29067
 # https://trac.macports.org/ticket/29104
@@ -213,6 +217,20 @@ compiler.blacklist-append {clang < 1001}
 
 # "-stdlib" would be passed on to the bootstrap compiler if present
 configure.cxx_stdlib
+
+# use gcc11-bootstrap as shortcut for macOS before 10.14
+if {${os.platform} eq "darwin" && ${os.major} < 18} {
+    configure.compiler.add_deps \
+                            no
+
+    depends_build-append \
+                            port:gcc10-bootstrap
+    depends_skip_archcheck-append \
+                            gcc10-bootstrap
+
+    configure.cc            ${prefix}/libexec/gcc10-bootstrap/bin/gcc
+    configure.cxx           ${prefix}/libexec/gcc10-bootstrap/bin/g++
+}
 
 build.dir           ${configure.dir}
 build.target        bootstrap-lean
