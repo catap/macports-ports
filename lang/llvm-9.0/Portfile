@@ -167,9 +167,6 @@ patchfiles-append \
     5001-patch-machoreader-strnlen.diff \
     5002-patch-objdumper-strnlen.diff
 
-# fix build on leopard
-patchfiles-append 5000-patch-llvm8-tools-dsymutil-symbolmap-use-older-cfname-and-fix-uuid-on-leopard.diff
-
 if {${subport} eq "clang-${llvm_version}"} {
     patchfiles-append \
         1001-MacPorts-Only-Prepare-clang-format-for-replacement-w.patch \

@@ -171,9 +171,6 @@ patchfiles \
     0004-Fix-build-issues-pre-Lion-due-to-missing-a-strnlen-d.patch \
     0005-Threading-Only-call-pthread_setname_np-on-SnowLeopar.patch
 
-# fix build on leopard
-patchfiles-append 5000-patch-llvm8-tools-dsymutil-symbolmap-use-older-cfname-and-fix-uuid-on-leopard.diff
-
 if {${subport} eq "clang-${llvm_version}"} {
     patchfiles-append \
         1001-MacPorts-Only-Prepare-clang-format-for-replacement-w.patch \

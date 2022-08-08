@@ -134,7 +134,6 @@ patchfiles \
     0006-Only-call-setpriority-PRIO_DARWIN_THREAD-0-PRIO_DARW.patch
 
 patchfiles-append \
-    5000-patch-llvm8-tools-dsymutil-symbolmap-use-older-cfname-and-fix-uuid-on-leopard.diff \
     5000-patch-lib-support-unix-path-copyfileclone-on-older-systems.diff \
     5001-patch-machoreader-strnlen.diff \
     5002-patch-objdumper-strnlen.diff \
