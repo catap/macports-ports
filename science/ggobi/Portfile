@@ -46,7 +46,7 @@ patchfiles          patch-src-texture.diff \
 configure.ldflags-append \
                     -lgmodule-2.0
 
-platform darwin 10 powerpc {
+platform darwin powerpc {
     # Use correct triple on Rosetta
     configure.args-append \
                     --build=powerpc-apple-darwin${os.major}

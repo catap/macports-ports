@@ -42,12 +42,10 @@ use_autoreconf      yes
 configure.args      --disable-postgresql \
                     --disable-plotutils
 
-platform darwin 10 {
-    # Rosetta needs this, otherwise it uses a wrong arch and clang
-    if {${build_arch} eq "ppc"} {
-        configure.args-append --build=powerpc-apple-darwin10
-        compiler.blacklist *clang*
-    }
+# Rosetta needs this, otherwise it uses a wrong arch and clang
+platform darwin powerpc {
+    configure.args-append --build=powerpc-apple-darwin${os.major}
+    compiler.blacklist *clang*
 }
 
 variant compiler description {Enable compiler, experimental} {

@@ -41,10 +41,8 @@ if {${os.platform} eq "darwin" && ${os.major} < 11} {
 }
 
 # Fix for Rosetta: https://trac.macports.org/ticket/64485
-platform darwin {
-    if {${os.major} == 10 && ${build_arch} eq "ppc"} {
-        configure.args-append --build=powerpc-apple-darwin${os.major}
-    }
+platform darwin powerpc {
+    configure.args-append --build=powerpc-apple-darwin${os.major}
 }
 
 # Older versions of cctools have a history of being problematic with complex

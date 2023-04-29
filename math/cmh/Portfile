@@ -31,8 +31,8 @@ patchfiles          patch-asprintf.diff \
 configure.args-append \
                     --enable-mpi=no
 
-platform darwin 10 powerpc {
-configure.args-append \
+platform darwin powerpc {
+    configure.args-append \
                     --build=powerpc-apple-darwin${os.major}
 }
 

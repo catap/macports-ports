@@ -18,7 +18,7 @@ index 9e624bf1..5c24c9af 100644
    else
    ifeq ($(POSIXOS),darwin)
 +    ifeq ($(OPTION),Rosetta)
-+      newarch=powerpc-apple-darwin10
++      newarch=powerpc-apple-darwin8
 +    else
      ifeq ($(PLATFORM),powerpc)
        ifeq ($(OPTION),64bits)
@@ -40,7 +40,7 @@ index 2e9ad7fe..f7bc7ba7 100755
  	    UNAME_PROCESSOR=x86_64
  	fi
 -	echo ${UNAME_PROCESSOR}-apple-darwin${UNAME_RELEASE}
-+	echo powerpc-apple-darwin10
++	echo powerpc-apple-darwin8
  	exit ;;
      *:procnto*:*:* | *:QNX:[0123456789]*:*)
  	UNAME_PROCESSOR=`uname -p`
@@ -53,7 +53,7 @@ index 2e9ad7fe..f7bc7ba7 100755
  	    UNAME_PROCESSOR=x86_64
  	fi
 -	echo ${UNAME_PROCESSOR}-apple-darwin${UNAME_RELEASE}
-+	echo powerpc-apple-darwin10
++	echo powerpc-apple-darwin8
  	exit ;;
      *:procnto*:*:* | *:QNX:[0123456789]*:*)
  	UNAME_PROCESSOR=`uname -p`

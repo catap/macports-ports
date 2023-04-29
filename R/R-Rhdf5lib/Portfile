@@ -14,16 +14,16 @@ checksums           rmd160  29b4cf4fd8e4a15b73092dd2d96e48e85867e313 \
                     size    12083336
 
 # Build system uses multiple configure scripts, and it gets messy on Rosetta otherwise.
-platform darwin 10 powerpc {
+platform darwin powerpc {
     patchfiles      patch-rosetta.diff
 
     post-patch {
-        reinplace "s,@BUILD@,powerpc-apple-darwin10,g" ${worksrcpath}/src/Makevars.in
+        reinplace "s,@BUILD@,powerpc-apple-darwin${os.major},g" ${worksrcpath}/src/Makevars.in
     }
 
     destroot.pre_args-append \
                     --configure-args=' \
-                        --build=powerpc-apple-darwin10 \
+                        --build=powerpc-apple-darwin${os.major} \
                         '
 }
 

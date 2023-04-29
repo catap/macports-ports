@@ -53,7 +53,7 @@ platform darwin powerpc {
     patchfiles          0001-Makefile-add-PPC-support.patch
 
     # Fix for Rosetta:
-    if {${os.major} == 10} {
+    if {${os.major} > 7 && ${os.major} < 11} {
         patchfiles-append \
                     0002-Rosetta-hack.patch
         configure.args-append \

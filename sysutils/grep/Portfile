@@ -53,7 +53,7 @@ depends_lib     port:gettext-runtime \
                 port:pcre2
 
 # Fix for Rosetta: https://trac.macports.org/ticket/64497
-platform darwin 10 {
+platform darwin {
     if {${build_arch} eq "ppc"} {
         configure.args-append \
                 --build=powerpc-apple-darwin${os.major}

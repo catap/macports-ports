@@ -81,8 +81,8 @@ configure.args      -Ddoctool=enabled \
 # 10.6.8 Rosetta requires a specific solution: https://github.com/mesonbuild/meson/issues/10351
 
 platform darwin {
-    if {${os.major} == 10 && ${build_arch} eq "ppc"} {
-        build.env-append    CC=${developer_dir}/usr/bin/powerpc-apple-darwin10-gcc-4.2.1
+    if {${os.major} > 7 && ${os.major} < 11 && ${build_arch} eq "ppc"} {
+        build.env-append    CC=${developer_dir}/usr/bin/powerpc-apple-darwin${os.major}-gcc-4.2.1
     } else {
         build.env-append    CC=${configure.cc}
     }

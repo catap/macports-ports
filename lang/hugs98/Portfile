@@ -79,7 +79,7 @@ use_parallel_build  no
 
 build.cmd           ${prefix}/bin/gmake
 
-platform darwin 10 powerpc {
+platform darwin powerpc {
     # We ought to convince Rosetta to build for the right arch
     configure.args-append   CC="${configure.cc} -arch ppc" \
                             --build=powerpc-apple-darwin${os.major}

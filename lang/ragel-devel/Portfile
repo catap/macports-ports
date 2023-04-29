@@ -80,7 +80,7 @@ post-destroot {
         ${destroot}${docdir}
 }
 
-platform darwin 10 powerpc {
+platform darwin powerpc {
     # Rosetta gets it wrong otherwise
     configure.args-append \
                     --build=powerpc-apple-darwin${os.major}

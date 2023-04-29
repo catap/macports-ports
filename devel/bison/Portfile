@@ -73,12 +73,10 @@ configure.args      --disable-silent-rules \
                     ac_cv_prog_VALGRIND=
 
 # Fix for Rosetta: https://trac.macports.org/ticket/64486
-platform darwin 10 {
-    if {${build_arch} eq "ppc"} {
-        configure.args-append \
+platform darwin powerpc {
+    configure.args-append \
             --build=powerpc-apple-darwin${os.major} \
             CC="${configure.cc} -arch ppc"
-    }
 }
 
 if {${subport} eq "bison-runtime"} {
