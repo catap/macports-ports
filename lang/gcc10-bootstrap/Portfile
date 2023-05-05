@@ -262,8 +262,13 @@ if {${os.major} < 18 || ${os.major} > 19} {
 }
 
 platform darwin 8 {
+    # See: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=45248
     configure.args-append \
                     --with-dwarf2
+
+    # See: https://trac.macports.org/ticket/67374
+    configure.args-append \
+                    --with-ld=/usr/bin/ld64
 }
 
 merger_arch_flag            yes
