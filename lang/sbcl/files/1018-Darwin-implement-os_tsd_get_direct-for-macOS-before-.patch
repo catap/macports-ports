@@ -1,4 +1,4 @@
-From 2dac0ee15c5f7c03b49ef9d11d3864e2dc348ab2 Mon Sep 17 00:00:00 2001
+From def312c5773c763c2896008c60bd737220181306 Mon Sep 17 00:00:00 2001
 From: "Kirill A. Korinsky" <kirill@korins.ky>
 Date: Sat, 10 Jun 2023 00:28:06 +0200
 Subject: [PATCH] Darwin: implement `os_tsd_get_direct` for macOS before 10.13

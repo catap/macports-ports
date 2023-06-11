@@ -49,7 +49,7 @@ checksums       rmd160  95a02d7a489137602ebba333b83bfc1d9eb794be \
 # Please do not update it without testing.
 if {${os.platform} eq "darwin" && ${configure.build_arch} in [list ppc i386]} {
     version     2.3.5
-    revision    0
+    revision    1
     epoch       [ expr ${epoch} + 1 ]
 
     checksums   rmd160  95a02d7a489137602ebba333b83bfc1d9eb794be \
@@ -61,7 +61,7 @@ if {${os.platform} eq "darwin" && ${configure.build_arch} in [list ppc i386]} {
                 1001-x86-Darwin-Revert-x86-darwin-files.patch \
                 1002-x86-Darwin-Revert-Perform-darwin-related-housekeepin.patch \
                 1003-x86-Darwin-Remove-mach-exception-handler.patch \
-                1004-Darwin-disable-custom-nanosleep-before-10.6.patch \
+                1004-Darwin-use-libc-nanosleep-before-10.6-and-on-PPC.patch \
                 1005-Darwin-recovery-support-non-dispatch-semaphores.patch \
                 1006-x86-Darwin-mask-out-O_LARGEFILE-in-fcntl.1-test.patch \
                 1007-x86-Darwin-revert-OS_THREAD_STACK.patch \
@@ -75,7 +75,8 @@ if {${os.platform} eq "darwin" && ${configure.build_arch} in [list ppc i386]} {
                 1015-ppc-Darwin-Misc-fixes-for-PPC.patch \
                 1016-ppc-Darwin-ppc-assem-a-minor-fix-to-assembler-syntax.patch \
                 1017-Fix-building-by-lisp-without-endian-features.patch \
-                1018-Darwin-implement-os_tsd_get_direct-for-macOS-before-.patch
+                1018-Darwin-implement-os_tsd_get_direct-for-macOS-before-.patch \
+                1019-ppc-Darwin-fix-threads-support.patch
 }
 
 distfiles       ${name}-${version}-source${extract.suffix}
@@ -170,9 +171,7 @@ post-build {
     }
 }
 
-# NOTE seems that threads never works on PowerPC
-# See: https://github.com/sbcl/sbcl/commit/33a6b2817f3e2a8cf98d162a2b40c50d259295c4
-if {![variant_isset threads] && ${configure.build_arch} ne "ppc"} {
+if {![variant_isset threads]} {
     default_variants +fancy
 }
 

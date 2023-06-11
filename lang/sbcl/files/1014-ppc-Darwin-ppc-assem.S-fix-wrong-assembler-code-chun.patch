@@ -1,4 +1,4 @@
-From f495aaffc057d039294e9afd4b68f42ebd82d724 Mon Sep 17 00:00:00 2001
+From 097732b219bc36292c5cb8ccc7a0e70876eba9d0 Mon Sep 17 00:00:00 2001
 From: barracuda156 <vital.had@gmail.com>
 Date: Mon, 5 Jun 2023 22:30:34 +0800
 Subject: [PATCH] ppc/Darwin: ppc-assem.S: fix wrong assembler code chunk

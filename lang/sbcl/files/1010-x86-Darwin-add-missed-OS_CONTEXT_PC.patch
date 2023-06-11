@@ -1,4 +1,4 @@
-From 4d3a5f8f0ce73d3286167e83b7276fc756a6ad43 Mon Sep 17 00:00:00 2001
+From a20d3cd28ef60b4f77dfb7e54f0bafaab46b50a5 Mon Sep 17 00:00:00 2001
 From: "Kirill A. Korinsky" <kirill@korins.ky>
 Date: Tue, 6 Jun 2023 10:31:51 +0200
 Subject: [PATCH] x86/Darwin: add missed OS_CONTEXT_PC
