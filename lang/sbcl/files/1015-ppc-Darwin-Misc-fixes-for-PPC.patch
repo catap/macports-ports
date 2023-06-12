@@ -1,4 +1,4 @@
-From 555c637c4ecece8ed3e6c68a483c7798cad82aa6 Mon Sep 17 00:00:00 2001
+From 7c3a5c381aa96e40ca4959d9c4286edd146bb154 Mon Sep 17 00:00:00 2001
 From: Sergey Fedorov <vital.had@gmail.com>
 Date: Mon, 5 Jun 2023 22:51:40 +0800
 Subject: [PATCH] ppc/Darwin: Misc fixes for PPC

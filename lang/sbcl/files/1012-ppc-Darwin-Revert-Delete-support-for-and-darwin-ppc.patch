@@ -1,4 +1,4 @@
-From 320bbe69f03ef2765d7368c3c48655c12ea40eaa Mon Sep 17 00:00:00 2001
+From 675b37ce2737e063908625190d4750b3e70b8b03 Mon Sep 17 00:00:00 2001
 From: Sergey Fedorov <vital.had@gmail.com>
 Date: Mon, 5 Jun 2023 22:03:43 +0800
 Subject: [PATCH] ppc/Darwin: Revert "Delete support for #+(and darwin ppc)"
@@ -591,7 +591,7 @@ index 000000000..b34a07236
 +# Nothing to do.
 +after-grovel-headers:
 diff --git src/runtime/monitor.c src/runtime/monitor.c
-index a768fe51e..1c9857db7 100644
+index 28fa9aa70..486521c4d 100644
 --- src/runtime/monitor.c
 +++ src/runtime/monitor.c
 @@ -640,6 +640,10 @@ print_context(os_context_t *context)
@@ -606,7 +606,7 @@ index a768fe51e..1c9857db7 100644
      printf("PC:\t\t  0x%08lx\n", (unsigned long)os_context_pc(context));
  #endif
 diff --git src/runtime/ppc-arch.c src/runtime/ppc-arch.c
-index 757997f09..a7624c00c 100644
+index 9cb7c4369..d74d85648 100644
 --- src/runtime/ppc-arch.c
 +++ src/runtime/ppc-arch.c
 @@ -46,8 +46,10 @@

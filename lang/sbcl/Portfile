@@ -2,7 +2,6 @@
 
 PortSystem      1.0
 
-PortGroup       legacysupport 1.1
 PortGroup       compiler_blacklist_versions 1.0
 
 name            sbcl
@@ -48,16 +47,15 @@ checksums       rmd160  95a02d7a489137602ebba333b83bfc1d9eb794be \
 #
 # Please do not update it without testing.
 if {${os.platform} eq "darwin" && ${configure.build_arch} in [list ppc i386]} {
-    version     2.3.5
-    revision    1
     epoch       [ expr ${epoch} + 1 ]
+}
 
-    checksums   rmd160  95a02d7a489137602ebba333b83bfc1d9eb794be \
-                sha256  89c90720cf9d05dbcd90d690e381a2514c0f1807159e0d7222220c5a8c2d5186 \
-                size    7474392
+# Move from 2.3.5 to master
+patchfiles-append \
+                patch-after-2.3.5.diff
 
-    # See: https://github.com/catap/sbcl/tree/macports-legacy
-    patchfiles-append \
+# Apply catap/darwin-x86-ppc
+patchfiles-append \
                 1001-x86-Darwin-Revert-x86-darwin-files.patch \
                 1002-x86-Darwin-Revert-Perform-darwin-related-housekeepin.patch \
                 1003-x86-Darwin-Remove-mach-exception-handler.patch \
@@ -76,8 +74,8 @@ if {${os.platform} eq "darwin" && ${configure.build_arch} in [list ppc i386]} {
                 1016-ppc-Darwin-ppc-assem-a-minor-fix-to-assembler-syntax.patch \
                 1017-Fix-building-by-lisp-without-endian-features.patch \
                 1018-Darwin-implement-os_tsd_get_direct-for-macOS-before-.patch \
-                1019-ppc-Darwin-fix-threads-support.patch
-}
+                1019-ppc-Darwin-fix-threads-support.patch \
+                1020-Darwin-fix-build-without-legacy-support-library.patch
 
 distfiles       ${name}-${version}-source${extract.suffix}
 worksrcdir      ${name}-${version}
@@ -86,12 +84,6 @@ depends_build-append \
                 port:sbcl-bootstrap
 depends_skip_archcheck-append \
                 sbcl-bootstrap
-
-# clock_gettime
-legacysupport.newest_darwin_requires_legacy 15
-# NOTE: check that it can be removed
-patchfiles-append \
-                0003-Use-CLOCK_MONOTONIC-when-CLOCK_PROCESS_CPUTIME_ID-un.patch
 
 # Uses: __attribute__((aligned(8)))
 # See: https://bugs.launchpad.net/sbcl/+bug/1991485
@@ -110,9 +102,9 @@ post-patch {
     foreach f [glob -tails -directory ${config_path} Config.*-darwin] {
         ui_debug "Adding MacPorts paths into ${f}"
         set config [open ${config_path}/$f a]
-        puts ${config} "CFLAGS += -I${prefix}/include [legacysupport::get_cpp_flags]"
-        puts ${config} "DEPEND_FLAGS += -I${prefix}/include [legacysupport::get_cpp_flags]"
-        puts ${config} "OS_LIBS += -L${prefix}/lib [legacysupport::get_library_link_flags]"
+        puts ${config} "CFLAGS += -I${prefix}/include"
+        puts ${config} "DEPEND_FLAGS += -I${prefix}/include"
+        puts ${config} "OS_LIBS += -L${prefix}/lib"
         close ${config}
     }
 }

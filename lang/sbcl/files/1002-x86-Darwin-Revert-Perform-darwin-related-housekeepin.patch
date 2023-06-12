@@ -1,4 +1,4 @@
-From 6928d6cf896af97596228e3bd1e30437c0b159a0 Mon Sep 17 00:00:00 2001
+From 4b9a5a4c637c076b340a147247db4d13716f7b30 Mon Sep 17 00:00:00 2001
 From: "Kirill A. Korinsky" <kirill@korins.ky>
 Date: Tue, 6 Jun 2023 23:40:14 +0200
 Subject: [PATCH] x86/Darwin: Revert "Perform darwin-related housekeeping"
@@ -12,7 +12,7 @@ This reverts commit f5386462b3ad5548763bc7de21d71cb723352af7.
  4 files changed, 85 insertions(+), 3 deletions(-)
 
 diff --git src/runtime/interrupt.c src/runtime/interrupt.c
-index af66f5839..477af6171 100644
+index d4b21f8af..5eb492302 100644
 --- src/runtime/interrupt.c
 +++ src/runtime/interrupt.c
 @@ -1571,6 +1571,7 @@ extern int *os_context_flags_addr(os_context_t *context);
@@ -38,7 +38,7 @@ index af66f5839..477af6171 100644
  
  // These have undefined_alien_function tramp in x-assem.S
 diff --git src/runtime/x86-arch.c src/runtime/x86-arch.c
-index 8969326d4..a662d758e 100644
+index c6dfcc33d..3b7bcd015 100644
 --- src/runtime/x86-arch.c
 +++ src/runtime/x86-arch.c
 @@ -80,6 +80,8 @@ os_context_flags_addr(os_context_t *context)

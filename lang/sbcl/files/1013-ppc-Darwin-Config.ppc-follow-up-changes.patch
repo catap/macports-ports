@@ -1,4 +1,4 @@
-From 73bf4a60ff3a14f8db807187cc8c007b06ac747b Mon Sep 17 00:00:00 2001
+From 7ed938a57cd8dc007df9a3c2725850c481c4ff7a Mon Sep 17 00:00:00 2001
 From: barracuda156 <vital.had@gmail.com>
 Date: Mon, 5 Jun 2023 22:29:05 +0800
 Subject: [PATCH] ppc/Darwin: Config.ppc: follow up changes

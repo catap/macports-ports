@@ -1,4 +1,4 @@
-From fa1e6470b89657f515506b4b07e65fe9c7f3da50 Mon Sep 17 00:00:00 2001
+From 7163d3d8f34d1a84d527e6451dae9cd798344a5c Mon Sep 17 00:00:00 2001
 From: barracuda156 <vital.had@gmail.com>
 Date: Tue, 6 Jun 2023 16:37:08 +0800
 Subject: [PATCH] ppc/Darwin: ppc-assem: a minor fix to assembler syntax

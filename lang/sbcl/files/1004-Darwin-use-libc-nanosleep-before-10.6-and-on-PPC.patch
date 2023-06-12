@@ -1,4 +1,4 @@
-From b5069d3f04ddf8e04af502cb50a12be85c8df50b Mon Sep 17 00:00:00 2001
+From 789b4c48b48c232ea5d1ee33f418f083d7f14db4 Mon Sep 17 00:00:00 2001
 From: "Kirill A. Korinsky" <kirill@korins.ky>
 Date: Sun, 11 Jun 2023 17:38:19 +0200
 Subject: [PATCH] Darwin: use libc nanosleep before 10.6 and on PPC
