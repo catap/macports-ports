@@ -1,0 +1,40 @@
+diff --git Source/WebCore/platform/graphics/gstreamer/MediaPlayerPrivateGStreamer.cpp Source/WebCore/platform/graphics/gstreamer/MediaPlayerPrivateGStreamer.cpp
+index eeb07fb776cf..9240ca9e4ab3 100644
+--- Source/WebCore/platform/graphics/gstreamer/MediaPlayerPrivateGStreamer.cpp
++++ Source/WebCore/platform/graphics/gstreamer/MediaPlayerPrivateGStreamer.cpp
+@@ -478,7 +478,7 @@ bool MediaPlayerPrivateGStreamer::doSeek(const MediaTime& position, float rate)
+ 
+     auto seekStart = toGstClockTime(startTime);
+     auto seekStop = toGstClockTime(endTime);
+-    GST_DEBUG_OBJECT(pipeline(), "[Seek] Performing actual seek to %" GST_TIMEP_FORMAT " (endTime: %" GST_TIMEP_FORMAT ") at rate %f", &seekStart, &seekStop, rate);
++    GST_DEBUG_OBJECT(pipeline(), "[Seek] Performing actual seek to %p\aT (endTime: %p\aT) at rate %f", &seekStart, &seekStop, rate);
+     return gst_element_seek(m_pipeline.get(), rate, GST_FORMAT_TIME, m_seekFlags, GST_SEEK_TYPE_SET, seekStart, GST_SEEK_TYPE_SET, seekStop);
+ }
+ 
+@@ -764,7 +764,7 @@ bool MediaPlayerPrivateGStreamer::didLoadingProgress() const
+         return false;
+ 
+     if (WEBKIT_IS_WEB_SRC(m_source.get())) {
+-        GST_LOG_OBJECT(pipeline(), "Last network read position: %" G_GUINT64_FORMAT ", current: %" G_GUINT64_FORMAT, m_readPositionAtLastDidLoadingProgress, m_networkReadPosition);
++        GST_LOG_OBJECT(pipeline(), "Last network read position: %llu, current: %llu", m_readPositionAtLastDidLoadingProgress, m_networkReadPosition);
+         bool didLoadingProgress = m_readPositionAtLastDidLoadingProgress < m_networkReadPosition;
+         m_readPositionAtLastDidLoadingProgress = m_networkReadPosition;
+         GST_LOG_OBJECT(pipeline(), "didLoadingProgress: %s", boolForPrinting(didLoadingProgress));
+@@ -1927,7 +1927,7 @@ void MediaPlayerPrivateGStreamer::handleMessage(GstMessage* message)
+             }
+         } else if (gst_structure_has_name(structure, "webkit-network-statistics")) {
+             if (gst_structure_get(structure, "read-position", G_TYPE_UINT64, &m_networkReadPosition, "size", G_TYPE_UINT64, &m_httpResponseTotalSize, nullptr))
+-                GST_LOG_OBJECT(pipeline(), "Updated network read position %" G_GUINT64_FORMAT ", size: %" G_GUINT64_FORMAT, m_networkReadPosition, m_httpResponseTotalSize);
++                GST_LOG_OBJECT(pipeline(), "Updated network read position %llu, size: %llu", m_networkReadPosition, m_httpResponseTotalSize);
+         } else if (gst_structure_has_name(structure, "GstCacheDownloadComplete")) {
+             GST_INFO_OBJECT(pipeline(), "Stream is fully downloaded, stopping monitoring downloading progress.");
+             m_fillTimer.stop();
+@@ -3535,7 +3535,7 @@ void MediaPlayerPrivateGStreamer::updateVideoSizeAndOrientationFromCaps(const Gs
+         height = originalSize.height();
+     }
+ 
+-    GST_DEBUG_OBJECT(pipeline(), "Saving natural size: %" G_GUINT64_FORMAT "x%" G_GUINT64_FORMAT, width, height);
++    GST_DEBUG_OBJECT(pipeline(), "Saving natural size: %llux%llu", width, height);
+     m_videoSize = FloatSize(static_cast<int>(width), static_cast<int>(height));
+     m_player->sizeChanged();
+ }

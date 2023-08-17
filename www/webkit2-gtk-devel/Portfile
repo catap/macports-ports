@@ -1,6 +1,6 @@
 # -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:filetype=tcl:et:sw=4:ts=4:sts=4
 
-# We have an umbrella radar tracking webkit-gtk issues on OS X.  Please relate
+# We have an umbrella radar tracking webkit-gtk issues on OS X. Please relate
 # any future issues with this tracker.
 # http://bugs.webkit.org/show_bug.cgi?id=126492
 
@@ -16,34 +16,42 @@ legacysupport.newest_darwin_requires_legacy 15
 
 name                webkit2-gtk-devel
 conflicts           webkit2-gtk
-version             2.28.2
-revision            3
+set my_name         webkitgtk
+version             2.40.5
+revision            0
 
-description         Apple's WebKit2 HTML rendering library for GTK+3
-long_description    ${description}
-maintainers         {devans @dbevans} {mascguy @mascguy}
 categories          www gnome
 platforms           darwin freebsd
 license             LGPL-2+ BSD
+maintainers         {devans @dbevans} {mascguy @mascguy} {@catap korins.ky:kirill}
+
+description         Apple's WebKit2 HTML rendering library for GTK
+long_description    ${description}
 homepage            http://webkitgtk.org/
+
 master_sites        http://webkitgtk.org/releases/
-
 use_xz              yes
-distname            webkitgtk-${version}
-
+distname            ${my_name}-${version}
 dist_subdir         webkit-gtk
 
-checksums           rmd160  a626f58cf30b6dd1ef8a63c165ce85770c4da675 \
-                    sha256  b9d23525cfd8d22c37b5d964a9fe9a8ce7583042a2f8d3922e71e6bbc68c30bd \
-                    size    21427772
+checksums           rmd160  4b2a257b6f65cd6232f351e47f19bf1b3df0eef5 \
+                    sha256  7de051a263668621d91a61a5eb1c3771d1a7cec900043d4afef06c326c16037f \
+                    size    40066432
+
+set perl_ver        5.34
+
+set py_ver          3.11
+set py_ver_nodot    [string map {. {}} ${py_ver}]
 
 depends_build-append \
+                    port:gi-docgen \
                     port:gperf \
                     port:gtk-doc \
-                    port:perl5.34 \
+                    port:perl${perl_ver} \
                     port:pkgconfig \
-                    port:python27 \
-                    port:py27-simplejson
+                    port:python${py_ver_nodot} \
+                    port:py${py_ver_nodot}-simplejson \
+                    port:unifdef
 
 depends_lib-append  port:atk \
                     port:at-spi2-atk \
@@ -60,7 +68,6 @@ depends_lib-append  port:atk \
                     port:gstreamer1-gst-plugins-bad \
                     port:gstreamer1-gst-plugins-base \
                     port:gstreamer1-gst-plugins-good \
-                    path:lib/pkgconfig/gtk+-3.0.pc:gtk3 \
                     path:lib/pkgconfig/harfbuzz-icu.pc:harfbuzz-icu \
                     port:hyphen \
                     path:lib/pkgconfig/icu-uc.pc:icu \
@@ -78,10 +85,8 @@ depends_lib-append  port:atk \
 
 
 # 1. add missing JavaScriptCore include directory used only on Apple webkit builds
-# 2. don't copy the ICU includes into the source tree
-# 3. add missing WebCore include directory used only on Apple webkit builds
-# 4. add a missing Apple-only header found in the WebKit project
-# 5. change some int64_t to gint64 to stop typedef errors in gstreamer
+# 2. add missing WebCore include directory used only on Apple webkit builds
+# 3. change some int64_t to gint64 to stop typedef errors in gstreamer
 patchfiles-append   patch-webkit2gtk-macports.diff
 
 # and a few more for webkit2-gtk-2.27.2
@@ -102,20 +107,14 @@ patchfiles-append    patch-enable-plugin-architecture-unix.diff
 # runs without this patch.
 patchfiles-append    patch-bundle-link-webcore.diff
 
-# Fix incompatibility with XCode 12:
-# https://bugs.webkit.org/show_bug.cgi?id=207871
-patchfiles-append    patch-WTF-wtf-getVTablePointer.diff
+# recover support of GTK at Darwin
+patchfiles-append   patch-darwin-GTK.diff
 
-# Fix build errors due to -WWc++11-narrowing
-# https://bugs.webkit.org/show_bug.cgi?id=211193
-patchfiles-append    patch-bool_narrowed.diff
+# Compatibility with gstreamer before 1.18, should be removed after update of gstreamer
+patchfiles-append   patch-gstreamer-before-1.18.diff
 
-# Explicitly specify installed dylib paths to g-ir-compile
-# Fixes dlopen errors in apps using webkit2gtk introspection
-patchfiles-append    patch-webkit2gtk-specify-installed-dylibs.diff
-
-# Backport https://github.com/WebKit/WebKit/commit/b83958928838b8a997c12a8de06f89377df0a903
-patchfiles-append    patch-icu-68-true-false.diff
+# # Compatibility with glib-2.70 and gtk3
+# patchfiles-append   patch-glib2.7-gtk3.diff
 
 # Reduce compilation warnings
 configure.cppflags-append \
@@ -125,32 +124,55 @@ configure.cppflags-append \
 # it has improved security features, but not all systems can build it at present.
 configure.args-append \
     -DPORT=GTK \
+    -DENABLE_GAMEPAD=OFF \
     -DENABLE_INTROSPECTION=ON \
+    -DENABLE_JOURNALD_LOG=OFF \
     -DENABLE_MINIBROWSER=OFF \
     -DENABLE_VIDEO=ON \
+    -DUSE_GSTREAMER_TRANSCODER=OFF \
     -DUSE_SYSTEM_MALLOC=OFF \
-    -DPERL_EXECUTABLE=${prefix}/bin/perl5.34
+    -DUSE_APPLE_ICU=OFF \
+    -DPERL_EXECUTABLE=${prefix}/bin/perl${perl_ver} \
+    -DPYTHON_EXECUTABLE=${prefix}/bin/python${py_ver} \
+    -DGPERF_EXECUTABLE=${prefix}/bin/gperf \
+    -DUNIFDEF_EXECUTABLE=${prefix}/bin/unifdef
 
 pre-configure {
     if {![variant_isset quartz] && ![variant_isset x11]} {
         error "Either +x11 or +quartz is required"
     }
+
+    if {![variant_isset gtk3] && ![variant_isset gtk4]} {
+        error "Either +gtk3 or +gtk4 is required"
+    }
 }
+
+# ERROR: Could not find GIR dependency in the search paths: GObject-2.0
+configure.args-append   -DENABLE_DOCUMENTATION=OFF
 
 if {![variant_isset quartz]} {
     default_variants-append +x11
 }
 
-# this is nice to have, and should be the default
-default_variants-append +minibrowser
+# TODO: enabling minibrowser variant or INTROSPECTION leads to
+#   fatal error: 'jsc/jsc.h' file not found
+# # this is nice to have, and should be the default
+# default_variants-append +minibrowser
+configure.args-replace  -DENABLE_INTROSPECTION=ON \
+                        -DENABLE_INTROSPECTION=OFF
 
 variant quartz conflicts x11 {
-    require_active_variants path:lib/pkgconfig/gtk+-3.0.pc:gtk3 quartz
+    if {[variant_isset gtk3]} {
+        require_active_variants path:lib/pkgconfig/gtk+-3.0.pc:gtk3 quartz
+    }
+    if {[variant_isset gtk4]} {
+        require_active_variants path:lib/pkgconfig/gtk4.pc:gtk4 quartz
+    }
 
     configure.args-append \
         -DENABLE_QUARTZ_TARGET=ON \
         -DENABLE_X11_TARGET=OFF \
-        -DENABLE_OPENGL=OFF
+        -DUSE_OPENGL_OR_ES=OFF
 
 # OPENGL does not work with +quartz, eg: https://trac.macports.org/ticket/52495
 # OPENGL must be explicitly turned off, otherwise GLX is found, but X11 is not, and:
@@ -160,12 +182,17 @@ variant quartz conflicts x11 {
 }
 
 variant x11 conflicts quartz {
-    require_active_variants path:lib/pkgconfig/gtk+-3.0.pc:gtk3 x11
+    if {[variant_isset gtk3]} {
+        require_active_variants path:lib/pkgconfig/gtk+-3.0.pc:gtk3 x11
+    }
+    if {[variant_isset gtk4]} {
+        require_active_variants path:lib/pkgconfig/gtk4.pc:gtk4 x11
+    }
 
     configure.args-append \
         -DENABLE_QUARTZ_TARGET=OFF \
         -DENABLE_X11_TARGET=ON \
-        -DENABLE_OPENGL=ON
+        -DUSE_OPENGL_OR_ES=ON
 
     depends_lib-append \
         port:mesa \
@@ -176,6 +203,22 @@ variant minibrowser description {Build and install MiniBrowser (for testing)} {
     configure.args-delete   -DENABLE_MINIBROWSER=OFF
     configure.args-append   -DENABLE_MINIBROWSER=ON
     depends_run-append       port:adwaita-icon-theme
+}
+
+variant gtk3 conflicts gtk4 description {Use the GTK3+ toolkit for the GUI} {
+    configure.args-append   -DUSE_GTK4=OFF
+
+    depends_lib-append      path:lib/pkgconfig/gtk+-3.0.pc:gtk3
+}
+
+variant gtk4 conflicts gtk3 description {Use the GTK4+ toolkit for the GUI} {
+    configure.args-append   -DUSE_GTK4=ON
+
+    depends_lib-append      path:lib/pkgconfig/gtk4.pc:gtk4
+}
+
+if {![variant_isset gtk4]} {
+    default_variants-append +gtk3
 }
 
 # see https://trac.macports.org/ticket/56792
@@ -263,4 +306,4 @@ behaviour from WebKitAvailability.h.
 
 livecheck.type      regex
 livecheck.url       http://webkitgtk.org/releases/
-livecheck.regex     "webkitgtk-(\\d+(?:\\.\\d+)+)"
+livecheck.regex     "${my_name}-(\\d+\\.\\d*\[02468\](?:\\.\\d+)*)"

@@ -1,0 +1,170 @@
+diff --git Source/JavaScriptCore/API/WebKitAvailability.h Source/JavaScriptCore/API/WebKitAvailability.h
+index 11e4087867b4..95ee92a38784 100644
+--- Source/JavaScriptCore/API/WebKitAvailability.h
++++ Source/JavaScriptCore/API/WebKitAvailability.h
+@@ -26,7 +26,7 @@
+ #ifndef __WebKitAvailability__
+ #define __WebKitAvailability__
+ 
+-#if defined(__APPLE__)
++#if defined(__APPLE__) && PLATFORM(COCOA)
+ 
+ #include <AvailabilityMacros.h>
+ #include <CoreFoundation/CoreFoundation.h>
+diff --git Source/WebKit/Platform/IPC/ArgumentCoders.h Source/WebKit/Platform/IPC/ArgumentCoders.h
+index a48ee5c5a354..53550706bcb6 100644
+--- Source/WebKit/Platform/IPC/ArgumentCoders.h
++++ Source/WebKit/Platform/IPC/ArgumentCoders.h
+@@ -43,14 +43,12 @@
+ #include <wtf/Unexpected.h>
+ #include <wtf/WallTime.h>
+ 
+-#if OS(DARWIN)
+-#include "ArgumentCodersDarwin.h"
+-#endif
+-#if OS(WINDOWS)
+-#include "ArgumentCodersWin.h"
+-#endif
+ #if USE(UNIX_DOMAIN_SOCKETS)
+ #include "ArgumentCodersUnix.h"
++#elif OS(DARWIN)
++#include "ArgumentCodersDarwin.h"
++#elif OS(WINDOWS)
++#include "ArgumentCodersWin.h"
+ #endif
+ 
+ namespace IPC {
+diff --git Source/WebKit/Platform/IPC/Attachment.h Source/WebKit/Platform/IPC/Attachment.h
+index 95689ca1e2f8..a5e85f2c544a 100644
+--- Source/WebKit/Platform/IPC/Attachment.h
++++ Source/WebKit/Platform/IPC/Attachment.h
+@@ -26,24 +26,22 @@
+ 
+ #pragma once
+ 
+-#if OS(DARWIN)
+-#include <wtf/MachSendRight.h>
+-#endif
+-
+ #if USE(UNIX_DOMAIN_SOCKETS)
+ #include <wtf/unix/UnixFileDescriptor.h>
++#elif OS(DARWIN)
++#include <wtf/MachSendRight.h>
+ #endif
+ 
+ namespace IPC {
+ 
+ // IPC::Attachment is a type representing objects that cannot be transferred as data,
+ // rather they are transferred via operating system cross-process communication primitives.
+-#if OS(DARWIN)
++#if USE(UNIX_DOMAIN_SOCKETS)
++using Attachment = UnixFileDescriptor;
++#elif OS(DARWIN)
+ using Attachment = MachSendRight;
+ #elif OS(WINDOWS)
+ using Attachment = int; // Windows does not need attachments at the moment.
+-#elif USE(UNIX_DOMAIN_SOCKETS)
+-using Attachment = UnixFileDescriptor;
+ #else
+ #error Unsupported platform
+ #endif
+diff --git Source/WebKit/Platform/IPC/Connection.h Source/WebKit/Platform/IPC/Connection.h
+index 80ec2791171a..c661b0adc46a 100644
+--- Source/WebKit/Platform/IPC/Connection.h
++++ Source/WebKit/Platform/IPC/Connection.h
+@@ -51,16 +51,12 @@
+ 
+ #if USE(UNIX_DOMAIN_SOCKETS)
+ #include <wtf/unix/UnixFileDescriptor.h>
+-#endif
+-
+-#if OS(DARWIN)
++#elif OS(DARWIN)
+ #include <mach/mach_port.h>
+ #include <wtf/MachSendRight.h>
+ #include <wtf/OSObjectPtr.h>
+ #include <wtf/spi/darwin/XPCSPI.h>
+-#endif
+-
+-#if OS(WINDOWS)
++#elif OS(WINDOWS)
+ #include <wtf/win/Win32Handle.h>
+ #endif
+ 
+@@ -199,7 +195,7 @@ public:
+ #endif
+     };
+ 
+-#if OS(DARWIN)
++#if OS(DARWIN) && !USE(UNIX_DOMAIN_SOCKETS)
+     xpc_connection_t xpcConnection() const { return m_xpcConnection.get(); }
+     std::optional<audit_token_t> getAuditToken();
+     pid_t remoteProcessID() const;
+diff --git Source/WebKit/Platform/SharedMemory.h Source/WebKit/Platform/SharedMemory.h
+index bddc0d2025a8..6aa544dcff6a 100644
+--- Source/WebKit/Platform/SharedMemory.h
++++ Source/WebKit/Platform/SharedMemory.h
+@@ -31,13 +31,9 @@
+ 
+ #if USE(UNIX_DOMAIN_SOCKETS)
+ #include <wtf/unix/UnixFileDescriptor.h>
+-#endif
+-
+-#if OS(WINDOWS)
++#elif OS(WINDOWS)
+ #include <wtf/win/Win32Handle.h>
+-#endif
+-
+-#if OS(DARWIN)
++#elif OS(DARWIN)
+ #include <wtf/MachSendRight.h>
+ #endif
+ 
+@@ -132,7 +128,7 @@ public:
+     Ref<WebCore::SharedBuffer> createSharedBuffer(size_t) const;
+ 
+ private:
+-#if OS(DARWIN)
++#if OS(DARWIN) && !USE(UNIX_DOMAIN_SOCKETS)
+     WTF::MachSendRight createSendRight(Protection) const;
+ #endif
+ 
+diff --git Source/WebKit/PlatformGTK.cmake Source/WebKit/PlatformGTK.cmake
+index 6252529e8b2e..62173d57b127 100644
+--- Source/WebKit/PlatformGTK.cmake
++++ Source/WebKit/PlatformGTK.cmake
+@@ -230,7 +230,7 @@ set(WebKitGTK_FAKE_API_HEADERS
+     ${WebKitGTK_FRAMEWORK_HEADERS_DIR}/webkitgtk-web-process-extension/webkit
+ )
+ 
+-if (NOT ENABLE_2022_GLIB_API)
++if (NOT USE_GTK4)
+     include(PlatformGTKDeprecated.cmake)
+ endif ()
+ 
+diff --git Source/WebKit/UIProcess/Launcher/glib/ProcessLauncherGLib.cpp Source/WebKit/UIProcess/Launcher/glib/ProcessLauncherGLib.cpp
+index 6eee853fa8a3..f2bf61bcd9b0 100644
+--- Source/WebKit/UIProcess/Launcher/glib/ProcessLauncherGLib.cpp
++++ Source/WebKit/UIProcess/Launcher/glib/ProcessLauncherGLib.cpp
+@@ -91,7 +91,7 @@ static int connectionOptions()
+ 
+ static bool isSandboxEnabled(const ProcessLauncher::LaunchOptions& launchOptions)
+ {
+-#if !USE(SYSTEM_MALLOC)
++#if !USE(SYSTEM_MALLOC) && defined(RUNNING_ON_VALGRIND)
+     if (RUNNING_ON_VALGRIND)
+         return false;
+ #endif
+diff --git Source/bmalloc/bmalloc/ProcessCheck.h Source/bmalloc/bmalloc/ProcessCheck.h
+index c9f762797244..c4b0146311f3 100644
+--- Source/bmalloc/bmalloc/ProcessCheck.h
++++ Source/bmalloc/bmalloc/ProcessCheck.h
+@@ -39,7 +39,7 @@ bool gigacageEnabledForProcess();
+ inline bool gigacageEnabledForProcess() { return true; }
+ #endif
+ 
+-#if BOS(DARWIN)
++#if BPLATFORM(MAC)
+ bool shouldAllowMiniMode();
+ #else
+ inline bool shouldAllowMiniMode() { return true; }

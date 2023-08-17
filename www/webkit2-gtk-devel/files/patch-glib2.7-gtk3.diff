@@ -1,0 +1,119 @@
+diff --git Source/WebKit/PlatformGTK.cmake Source/WebKit/PlatformGTK.cmake
+index 6252529e8b2e..62173d57b127 100644
+--- Source/WebKit/PlatformGTK.cmake
++++ Source/WebKit/PlatformGTK.cmake
+@@ -230,7 +230,7 @@ set(WebKitGTK_FAKE_API_HEADERS
+     ${WebKitGTK_FRAMEWORK_HEADERS_DIR}/webkitgtk-web-process-extension/webkit
+ )
+ 
+-if (NOT ENABLE_2022_GLIB_API)
++if (NOT USE_GTK4)
+     include(PlatformGTKDeprecated.cmake)
+ endif ()
+ 
+diff --git Source/WebKit/UIProcess/API/glib/WebKitError.h.in Source/WebKit/UIProcess/API/glib/WebKitError.h.in
+index 7c36660a0c36..368d657812ce 100644
+--- Source/WebKit/UIProcess/API/glib/WebKitError.h.in
++++ Source/WebKit/UIProcess/API/glib/WebKitError.h.in
+@@ -81,7 +81,7 @@ typedef enum {
+     WEBKIT_POLICY_ERROR_CANNOT_USE_RESTRICTED_PORT = 103
+ } WebKitPolicyError;
+ 
+-#if !ENABLE(2022_GLIB_API)
++#if !USE(GTK4)
+ /**
+  * WebKitPluginError:
+  * @WEBKIT_PLUGIN_ERROR_FAILED: Generic plugin load failure. Deprecated 2.32
+diff --git Source/WebKit/UIProcess/API/glib/WebKitWebContext.h.in Source/WebKit/UIProcess/API/glib/WebKitWebContext.h.in
+index fa559936ba81..1d5262161181 100644
+--- Source/WebKit/UIProcess/API/glib/WebKitWebContext.h.in
++++ Source/WebKit/UIProcess/API/glib/WebKitWebContext.h.in
+@@ -94,7 +94,7 @@ typedef enum {
+     WEBKIT_CACHE_MODEL_DOCUMENT_BROWSER
+ } WebKitCacheModel;
+ 
+-#if !ENABLE(2022_GLIB_API)
++#if !USE(GTK4)
+ /**
+  * WebKitProcessModel:
+  * @WEBKIT_PROCESS_MODEL_SHARED_SECONDARY_PROCESS: Deprecated 2.26.
+diff --git Source/WebKit/UIProcess/API/glib/WebKitWebsiteData.h.in Source/WebKit/UIProcess/API/glib/WebKitWebsiteData.h.in
+index a8727e79449f..b20cbd1eef06 100644
+--- Source/WebKit/UIProcess/API/glib/WebKitWebsiteData.h.in
++++ Source/WebKit/UIProcess/API/glib/WebKitWebsiteData.h.in
+@@ -31,7 +31,7 @@ G_BEGIN_DECLS
+ 
+ typedef struct _WebKitWebsiteData WebKitWebsiteData;
+ 
+-#if ENABLE(2022_GLIB_API)
++#if USE(GTK4)
+ typedef enum {
+     WEBKIT_WEBSITE_DATA_MEMORY_CACHE                 = 1 << 0,
+     WEBKIT_WEBSITE_DATA_DISK_CACHE                   = 1 << 1,
+diff --git Source/WebKit/WebProcess/InjectedBundle/API/glib/WebKitFrame.h.in Source/WebKit/WebProcess/InjectedBundle/API/glib/WebKitFrame.h.in
+index 1000ccad0674..2fb7bc70ca9a 100644
+--- Source/WebKit/WebProcess/InjectedBundle/API/glib/WebKitFrame.h.in
++++ Source/WebKit/WebProcess/InjectedBundle/API/glib/WebKitFrame.h.in
+@@ -27,9 +27,12 @@
+ #include <@API_INCLUDE_PREFIX@/WebKitDefines.h>
+ #include <@API_INCLUDE_PREFIX@/WebKitScriptWorld.h>
+ 
++#if PLATFORM(GTK) && !USE(GTK4)
++#include <JavaScriptCore/JSBase.h>
++#endif
++
+ #if !ENABLE(2022_GLIB_API)
+ #if PLATFORM(GTK)
+-#include <JavaScriptCore/JSBase.h>
+ #include <webkitdom/webkitdom.h>
+ #elif PLATFORM(WPE)
+ #include <wpe/webkitdom.h>
+diff --git Source/WebKit/WebProcess/InjectedBundle/API/glib/webkit-web-process-extension.h.in Source/WebKit/WebProcess/InjectedBundle/API/glib/webkit-web-process-extension.h.in
+index 91f13a635211..31c27cd531d6 100644
+--- Source/WebKit/WebProcess/InjectedBundle/API/glib/webkit-web-process-extension.h.in
++++ Source/WebKit/WebProcess/InjectedBundle/API/glib/webkit-web-process-extension.h.in
+@@ -40,7 +40,7 @@
+ 
+ #define __WEBKIT_WEB_PROCESS_EXTENSION_H_INSIDE__
+ 
+-#if !ENABLE(2022_GLIB_API)
++#if !USE(GTK4)
+ #include <@API_INCLUDE_PREFIX@/WebKitConsoleMessage.h>
+ #endif
+ #include <@API_INCLUDE_PREFIX@/WebKitContextMenu.h>
+diff --git Source/cmake/OptionsGTK.cmake Source/cmake/OptionsGTK.cmake
+index 43605cd73c67..421ce2e66639 100644
+--- Source/cmake/OptionsGTK.cmake
++++ Source/cmake/OptionsGTK.cmake
+@@ -224,23 +224,24 @@ endif ()
+ if (USE_GTK4)
+     set(WEBKITGTK_API_INFIX "")
+     set(WEBKITGTK_API_VERSION "6.0")
+-    SET_AND_EXPOSE_TO_BUILD(ENABLE_2022_GLIB_API ON)
++    set(GLIB_MINIMUM_VERSION 2.70.0)
+ elseif (USE_SOUP2)
+     set(WEBKITGTK_API_INFIX "2")
+     set(WEBKITGTK_API_VERSION "4.0")
+-    SET_AND_EXPOSE_TO_BUILD(ENABLE_2022_GLIB_API OFF)
++    set(GLIB_MINIMUM_VERSION 2.56.4)
+ else ()
+     set(WEBKITGTK_API_INFIX "2")
+     set(WEBKITGTK_API_VERSION "4.1")
+-    SET_AND_EXPOSE_TO_BUILD(ENABLE_2022_GLIB_API OFF)
++    set(GLIB_MINIMUM_VERSION 2.56.4)
+ endif ()
+ 
+-if (ENABLE_2022_GLIB_API)
+-    set(GLIB_MINIMUM_VERSION 2.70.0)
++find_package(GLIB ${GLIB_MINIMUM_VERSION} REQUIRED COMPONENTS gio gio-unix gobject gthread gmodule)
++
++if (GLIB_VERSION VERSION_GREATER_EQUAL 2.70.0)
++    SET_AND_EXPOSE_TO_BUILD(ENABLE_2022_GLIB_API ON)
+ else ()
+-    set(GLIB_MINIMUM_VERSION 2.56.4)
++    SET_AND_EXPOSE_TO_BUILD(ENABLE_2022_GLIB_API OFF)
+ endif ()
+-find_package(GLIB ${GLIB_MINIMUM_VERSION} REQUIRED COMPONENTS gio gio-unix gobject gthread gmodule)
+ 
+ EXPOSE_STRING_VARIABLE_TO_BUILD(WEBKITGTK_API_INFIX)
+ EXPOSE_STRING_VARIABLE_TO_BUILD(WEBKITGTK_API_VERSION)
