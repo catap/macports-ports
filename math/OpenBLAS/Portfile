@@ -27,13 +27,13 @@ if {${os.major} < 9} {
 subport OpenBLAS-devel {}
 if {[string first "-devel" $subport] > 0} {
 
-    github.setup    OpenMathLib OpenBLAS 48b1b7cbc917bffa6f320b11783578ca6b525f38
+    github.setup    OpenMathLib OpenBLAS 864c65b526945604597ef9da1571a2f36b408054
     github.tarball_from archive
-    version         20230921-[string range ${github.version} 0 7]
-    checksums       rmd160  5910b6fdc4cb67f8e32f12fab303156aca5b330b \
-                    sha256  4fededf4eecb0def7d27217d098f44ba7029618fb46539b39e528de3a75c420b \
-                    size    24303945
-    revision        1
+    version         20231119-[string range ${github.version} 0 7]
+    checksums       rmd160  30577718a2f6880b2c9a799fa0dcf8830ef91c47 \
+                    sha256  7be7acf6cc22c55a36980953942e1f6fecadf993bd6e02b793b70e15fbd25e9e \
+                    size    24307835
+    revision        0
 
     conflicts       OpenBLAS
 
