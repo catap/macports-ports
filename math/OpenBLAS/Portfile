@@ -57,6 +57,7 @@ if {[string first "-devel" $subport] > 0} {
     conflicts       OpenBLAS-devel
 
     patchfiles      patch-libnoarch.release.diff \
+                    patch-xcode15-fix.diff \
                     patch-OpenBLAS-i386-Apple.diff
 
     if {![variant_isset native]} {
