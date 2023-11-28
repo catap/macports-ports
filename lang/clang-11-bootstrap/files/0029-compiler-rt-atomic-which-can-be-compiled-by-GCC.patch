@@ -1,4 +1,4 @@
-From ac23587c43ba957f530de1c4b2214ea1aaae39d6 Mon Sep 17 00:00:00 2001
+From b60fb4f0803c624f5bf70679488652a3b24afa59 Mon Sep 17 00:00:00 2001
 From: "Kirill A. Korinsky" <kirill@korins.ky>
 Date: Thu, 18 Aug 2022 00:14:22 +0200
 Subject: [PATCH] [compiler-rt] atomic which can be compiled by GCC
@@ -13,10 +13,10 @@ Subject: [PATCH] [compiler-rt] atomic which can be compiled by GCC
  .../lib/builtins/atomic_thread_fence.c        |   4 +
  7 files changed, 133 insertions(+)
 
-diff --git a/compiler-rt/lib/builtins/atomic.c b/compiler-rt/lib/builtins/atomic.c
+diff --git compiler-rt/lib/builtins/atomic.c compiler-rt/lib/builtins/atomic.c
 index 8634a72e77d1..c4f6e6bfad25 100644
---- a/compiler-rt/lib/builtins/atomic.c
-+++ b/compiler-rt/lib/builtins/atomic.c
+--- compiler-rt/lib/builtins/atomic.c
++++ compiler-rt/lib/builtins/atomic.c
 @@ -123,10 +123,17 @@ static __inline Lock *lock_for_pointer(void *ptr) {
  /// Macros for determining whether a size is lock free.  Clang can not yet
  /// codegen __atomic_is_lock_free(16), so for now we assume 16-byte values are
@@ -237,10 +237,10 @@ index 8634a72e77d1..c4f6e6bfad25 100644
  
  #define OPTIMISED_CASE(n, lockfree, type) ATOMIC_RMW(n, lockfree, type, add, +)
  OPTIMISED_CASES
-diff --git a/compiler-rt/lib/builtins/atomic_flag_clear.c b/compiler-rt/lib/builtins/atomic_flag_clear.c
+diff --git compiler-rt/lib/builtins/atomic_flag_clear.c compiler-rt/lib/builtins/atomic_flag_clear.c
 index 983e5d7f076b..7100536cb8a7 100644
---- a/compiler-rt/lib/builtins/atomic_flag_clear.c
-+++ b/compiler-rt/lib/builtins/atomic_flag_clear.c
+--- compiler-rt/lib/builtins/atomic_flag_clear.c
++++ compiler-rt/lib/builtins/atomic_flag_clear.c
 @@ -19,7 +19,11 @@
  #include <stdatomic.h>
  #undef atomic_flag_clear
@@ -253,10 +253,10 @@ index 983e5d7f076b..7100536cb8a7 100644
  }
  
  #endif
-diff --git a/compiler-rt/lib/builtins/atomic_flag_clear_explicit.c b/compiler-rt/lib/builtins/atomic_flag_clear_explicit.c
+diff --git compiler-rt/lib/builtins/atomic_flag_clear_explicit.c compiler-rt/lib/builtins/atomic_flag_clear_explicit.c
 index e61c0647684e..9ef065a71c87 100644
---- a/compiler-rt/lib/builtins/atomic_flag_clear_explicit.c
-+++ b/compiler-rt/lib/builtins/atomic_flag_clear_explicit.c
+--- compiler-rt/lib/builtins/atomic_flag_clear_explicit.c
++++ compiler-rt/lib/builtins/atomic_flag_clear_explicit.c
 @@ -20,7 +20,11 @@
  #undef atomic_flag_clear_explicit
  void atomic_flag_clear_explicit(volatile atomic_flag *object,
@@ -269,10 +269,10 @@ index e61c0647684e..9ef065a71c87 100644
  }
  
  #endif
-diff --git a/compiler-rt/lib/builtins/atomic_flag_test_and_set.c b/compiler-rt/lib/builtins/atomic_flag_test_and_set.c
+diff --git compiler-rt/lib/builtins/atomic_flag_test_and_set.c compiler-rt/lib/builtins/atomic_flag_test_and_set.c
 index ee22b08b5669..aa1fddeed3e7 100644
---- a/compiler-rt/lib/builtins/atomic_flag_test_and_set.c
-+++ b/compiler-rt/lib/builtins/atomic_flag_test_and_set.c
+--- compiler-rt/lib/builtins/atomic_flag_test_and_set.c
++++ compiler-rt/lib/builtins/atomic_flag_test_and_set.c
 @@ -19,7 +19,11 @@
  #include <stdatomic.h>
  #undef atomic_flag_test_and_set
@@ -285,10 +285,10 @@ index ee22b08b5669..aa1fddeed3e7 100644
  }
  
  #endif
-diff --git a/compiler-rt/lib/builtins/atomic_flag_test_and_set_explicit.c b/compiler-rt/lib/builtins/atomic_flag_test_and_set_explicit.c
+diff --git compiler-rt/lib/builtins/atomic_flag_test_and_set_explicit.c compiler-rt/lib/builtins/atomic_flag_test_and_set_explicit.c
 index 8c9d03994267..e6ccbe17edca 100644
---- a/compiler-rt/lib/builtins/atomic_flag_test_and_set_explicit.c
-+++ b/compiler-rt/lib/builtins/atomic_flag_test_and_set_explicit.c
+--- compiler-rt/lib/builtins/atomic_flag_test_and_set_explicit.c
++++ compiler-rt/lib/builtins/atomic_flag_test_and_set_explicit.c
 @@ -20,7 +20,11 @@
  #undef atomic_flag_test_and_set_explicit
  _Bool atomic_flag_test_and_set_explicit(volatile atomic_flag *object,
@@ -301,10 +301,10 @@ index 8c9d03994267..e6ccbe17edca 100644
  }
  
  #endif
-diff --git a/compiler-rt/lib/builtins/atomic_signal_fence.c b/compiler-rt/lib/builtins/atomic_signal_fence.c
+diff --git compiler-rt/lib/builtins/atomic_signal_fence.c compiler-rt/lib/builtins/atomic_signal_fence.c
 index f4f5169d3008..6ca9dfde646e 100644
---- a/compiler-rt/lib/builtins/atomic_signal_fence.c
-+++ b/compiler-rt/lib/builtins/atomic_signal_fence.c
+--- compiler-rt/lib/builtins/atomic_signal_fence.c
++++ compiler-rt/lib/builtins/atomic_signal_fence.c
 @@ -19,7 +19,11 @@
  #include <stdatomic.h>
  #undef atomic_signal_fence
@@ -317,10 +317,10 @@ index f4f5169d3008..6ca9dfde646e 100644
  }
  
  #endif
-diff --git a/compiler-rt/lib/builtins/atomic_thread_fence.c b/compiler-rt/lib/builtins/atomic_thread_fence.c
+diff --git compiler-rt/lib/builtins/atomic_thread_fence.c compiler-rt/lib/builtins/atomic_thread_fence.c
 index 5659ecb0b1f9..d980f955b544 100644
---- a/compiler-rt/lib/builtins/atomic_thread_fence.c
-+++ b/compiler-rt/lib/builtins/atomic_thread_fence.c
+--- compiler-rt/lib/builtins/atomic_thread_fence.c
++++ compiler-rt/lib/builtins/atomic_thread_fence.c
 @@ -19,7 +19,11 @@
  #include <stdatomic.h>
  #undef atomic_thread_fence
@@ -334,5 +334,5 @@ index 5659ecb0b1f9..d980f955b544 100644
  
  #endif
 -- 
-2.37.2
+2.43.0
 

@@ -1,4 +1,4 @@
-From fd4de49747f1528eb72b2b73319bcab5d4298c9a Mon Sep 17 00:00:00 2001
+From 6d6a108c43174a07538705b2952b0543b2d105f7 Mon Sep 17 00:00:00 2001
 From: Jeremy Huddleston Sequoia <jeremyhu@apple.com>
 Date: Sat, 17 Jan 2015 16:26:20 -0800
 Subject: [PATCH] Fix missing long long math prototypes when using the Snow
@@ -9,10 +9,10 @@ Signed-off-by: Jeremy Huddleston Sequoia <jeremyhu@apple.com>
  libcxx/include/math.h | 26 ++++++++++++++++++++++++++
  1 file changed, 26 insertions(+)
 
-diff --git a/libcxx/include/math.h b/libcxx/include/math.h
+diff --git libcxx/include/math.h libcxx/include/math.h
 index 1603d5748e2d..d64e6a52ccd3 100644
---- a/libcxx/include/math.h
-+++ b/libcxx/include/math.h
+--- libcxx/include/math.h
++++ libcxx/include/math.h
 @@ -299,6 +299,32 @@ long double    truncl(long double x);
  
  #include_next <math.h>
@@ -47,5 +47,5 @@ index 1603d5748e2d..d64e6a52ccd3 100644
  
  // We support including .h headers inside 'extern "C"' contexts, so switch
 -- 
-2.37.2
+2.43.0
 

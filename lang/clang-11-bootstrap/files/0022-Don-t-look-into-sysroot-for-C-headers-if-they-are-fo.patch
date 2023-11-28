@@ -1,4 +1,4 @@
-From b4e43cb5b9fc3ea342a37a27e3af78393575cc72 Mon Sep 17 00:00:00 2001
+From 1e044d2d679bdc05cb8069dbbfca095420d6ea2f Mon Sep 17 00:00:00 2001
 From: "Kirill A. Korinsky" <kirill@korins.ky>
 Date: Wed, 17 Aug 2022 14:17:11 +0200
 Subject: [PATCH] Don't look into <sysroot> for C++ headers if they are found
@@ -26,10 +26,10 @@ See: https://reviews.llvm.org/D89001
  .../Driver/darwin-header-search-libcxx.cpp    | 101 ++++++++++++++----
  2 files changed, 112 insertions(+), 36 deletions(-)
 
-diff --git a/clang/lib/Driver/ToolChains/Darwin.cpp b/clang/lib/Driver/ToolChains/Darwin.cpp
+diff --git clang/lib/Driver/ToolChains/Darwin.cpp clang/lib/Driver/ToolChains/Darwin.cpp
 index 2219c7a7374c..cfce415edc86 100644
---- a/clang/lib/Driver/ToolChains/Darwin.cpp
-+++ b/clang/lib/Driver/ToolChains/Darwin.cpp
+--- clang/lib/Driver/ToolChains/Darwin.cpp
++++ clang/lib/Driver/ToolChains/Darwin.cpp
 @@ -2027,21 +2027,42 @@ void DarwinClang::AddClangCXXStdlibIncludeArgs(
  
    switch (GetCXXStdlibType(DriverArgs)) {
@@ -86,10 +86,10 @@ index 2219c7a7374c..cfce415edc86 100644
      break;
    }
  
-diff --git a/clang/test/Driver/darwin-header-search-libcxx.cpp b/clang/test/Driver/darwin-header-search-libcxx.cpp
+diff --git clang/test/Driver/darwin-header-search-libcxx.cpp clang/test/Driver/darwin-header-search-libcxx.cpp
 index 6bdbbd11908a..4824525f1cf4 100644
---- a/clang/test/Driver/darwin-header-search-libcxx.cpp
-+++ b/clang/test/Driver/darwin-header-search-libcxx.cpp
+--- clang/test/Driver/darwin-header-search-libcxx.cpp
++++ clang/test/Driver/darwin-header-search-libcxx.cpp
 @@ -13,39 +13,57 @@
  // RUN:   | FileCheck --check-prefix=CHECK-LIBCXX-NONE %s
  // CHECK-LIBCXX-NONE: "{{[^"]*}}clang{{[^"]*}}" "-cc1"
@@ -263,5 +263,5 @@ index 6bdbbd11908a..4824525f1cf4 100644
 +// CHECK-LIBCXX-MISSING-BOTH: ignoring nonexistent directory "[[TOOLCHAIN]]/usr/bin/../include/c++/v1"
 +// CHECK-LIBCXX-MISSING-BOTH: ignoring nonexistent directory "[[SYSROOT]]/usr/include/c++/v1"
 -- 
-2.37.2
+2.43.0
 

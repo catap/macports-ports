@@ -11,10 +11,10 @@ Signed-off-by: Jeremy Huddleston Sequoia <jeremyhu@apple.com>
  llvm/lib/Support/Unix/Signals.inc | 9 +++++++++
  1 file changed, 9 insertions(+)
 
-diff --git a/llvm/lib/Support/Unix/Signals.inc b/llvm/lib/Support/Unix/Signals.inc
+diff --git llvm/lib/Support/Unix/Signals.inc llvm/lib/Support/Unix/Signals.inc
 index f68374d29f02..977058c089ab 100644
---- a/llvm/lib/Support/Unix/Signals.inc
-+++ b/llvm/lib/Support/Unix/Signals.inc
+--- llvm/lib/Support/Unix/Signals.inc
++++ llvm/lib/Support/Unix/Signals.inc
 @@ -635,6 +635,15 @@ void llvm::sys::PrintStackTraceOnErrorSignal(StringRef Argv0,
    AddSignalHandler(PrintStackTraceSignalHandler, nullptr);
  
@@ -32,5 +32,5 @@ index f68374d29f02..977058c089ab 100644
    if (DisableCrashReporting || getenv("LLVM_DISABLE_CRASH_REPORT")) {
      mach_port_t self = mach_task_self();
 -- 
-2.37.2
+2.43.0
 

@@ -1,4 +1,4 @@
-From 7f47b12289d44de089feb7fcb80c9412b3138ec5 Mon Sep 17 00:00:00 2001
+From ea2c38992045d8fb1be6a3807ff167597a0d4be1 Mon Sep 17 00:00:00 2001
 From: "Kirill A. Korinsky" <kirill@korins.ky>
 Date: Tue, 30 Aug 2022 14:34:44 +0200
 Subject: [PATCH] [clang] Implement the using_if_exists attribute
@@ -33,10 +33,10 @@ Backport from https://reviews.llvm.org/D90188
  create mode 100644 clang/test/Parser/using-if-exists-attr.cpp
  create mode 100644 clang/test/SemaCXX/using-if-exists.cpp
 
-diff --git a/clang/include/clang/AST/DeclCXX.h b/clang/include/clang/AST/DeclCXX.h
+diff --git clang/include/clang/AST/DeclCXX.h clang/include/clang/AST/DeclCXX.h
 index 2b8d7e879a0a..266c6c1d3f51 100644
---- a/clang/include/clang/AST/DeclCXX.h
-+++ b/clang/include/clang/AST/DeclCXX.h
+--- clang/include/clang/AST/DeclCXX.h
++++ clang/include/clang/AST/DeclCXX.h
 @@ -3788,6 +3788,28 @@ public:
    static bool classofKind(Kind K) { return K == UnresolvedUsingTypename; }
  };
@@ -66,10 +66,10 @@ index 2b8d7e879a0a..266c6c1d3f51 100644
  /// Represents a C++11 static_assert declaration.
  class StaticAssertDecl : public Decl {
    llvm::PointerIntPair<Expr *, 1, bool> AssertExprAndFailed;
-diff --git a/clang/include/clang/AST/RecursiveASTVisitor.h b/clang/include/clang/AST/RecursiveASTVisitor.h
+diff --git clang/include/clang/AST/RecursiveASTVisitor.h clang/include/clang/AST/RecursiveASTVisitor.h
 index 3dcfc9fee629..2c04eae7c03e 100644
---- a/clang/include/clang/AST/RecursiveASTVisitor.h
-+++ b/clang/include/clang/AST/RecursiveASTVisitor.h
+--- clang/include/clang/AST/RecursiveASTVisitor.h
++++ clang/include/clang/AST/RecursiveASTVisitor.h
 @@ -1816,6 +1816,8 @@ DEF_TRAVERSE_DECL(UnresolvedUsingTypenameDecl, {
    // source.
  })
@@ -79,10 +79,10 @@ index 3dcfc9fee629..2c04eae7c03e 100644
  DEF_TRAVERSE_DECL(EnumDecl, {
    TRY_TO(TraverseDeclTemplateParameterLists(D));
  
-diff --git a/clang/include/clang/Basic/Attr.td b/clang/include/clang/Basic/Attr.td
+diff --git clang/include/clang/Basic/Attr.td clang/include/clang/Basic/Attr.td
 index 60eaee7839e2..1bc86e43b6e6 100644
---- a/clang/include/clang/Basic/Attr.td
-+++ b/clang/include/clang/Basic/Attr.td
+--- clang/include/clang/Basic/Attr.td
++++ clang/include/clang/Basic/Attr.td
 @@ -3421,6 +3421,14 @@ def NoBuiltin : Attr {
    let Documentation = [NoBuiltinDocs];
  }
@@ -98,10 +98,10 @@ index 60eaee7839e2..1bc86e43b6e6 100644
  // FIXME: This attribute is not inheritable, it will not be propagated to
  // redecls. [[clang::lifetimebound]] has the same problems. This should be
  // fixed in TableGen (by probably adding a new inheritable flag).
-diff --git a/clang/include/clang/Basic/AttrDocs.td b/clang/include/clang/Basic/AttrDocs.td
+diff --git clang/include/clang/Basic/AttrDocs.td clang/include/clang/Basic/AttrDocs.td
 index 833127ed44eb..46929ce49599 100644
---- a/clang/include/clang/Basic/AttrDocs.td
-+++ b/clang/include/clang/Basic/AttrDocs.td
+--- clang/include/clang/Basic/AttrDocs.td
++++ clang/include/clang/Basic/AttrDocs.td
 @@ -4820,6 +4820,31 @@ once.
    }];
  }
@@ -134,10 +134,10 @@ index 833127ed44eb..46929ce49599 100644
  def HandleDocs : DocumentationCategory<"Handle Attributes"> {
    let Content = [{
  Handles are a way to identify resources like files, sockets, and processes.
-diff --git a/clang/include/clang/Basic/DeclNodes.td b/clang/include/clang/Basic/DeclNodes.td
+diff --git clang/include/clang/Basic/DeclNodes.td clang/include/clang/Basic/DeclNodes.td
 index 866988ee3f01..c7d3f513b7d5 100644
---- a/clang/include/clang/Basic/DeclNodes.td
-+++ b/clang/include/clang/Basic/DeclNodes.td
+--- clang/include/clang/Basic/DeclNodes.td
++++ clang/include/clang/Basic/DeclNodes.td
 @@ -74,6 +74,7 @@ def Named : DeclNode<Decl, "named declarations", 1>;
    def UsingPack : DeclNode<Named>;
    def UsingShadow : DeclNode<Named>;
@@ -146,10 +146,10 @@ index 866988ee3f01..c7d3f513b7d5 100644
    def ObjCMethod : DeclNode<Named, "Objective-C methods">, DeclContext;
    def ObjCContainer : DeclNode<Named, "Objective-C containers", 1>, DeclContext;
      def ObjCCategory : DeclNode<ObjCContainer>;
-diff --git a/clang/include/clang/Basic/DiagnosticSemaKinds.td b/clang/include/clang/Basic/DiagnosticSemaKinds.td
+diff --git clang/include/clang/Basic/DiagnosticSemaKinds.td clang/include/clang/Basic/DiagnosticSemaKinds.td
 index 941f2cafc372..0581296ac802 100644
---- a/clang/include/clang/Basic/DiagnosticSemaKinds.td
-+++ b/clang/include/clang/Basic/DiagnosticSemaKinds.td
+--- clang/include/clang/Basic/DiagnosticSemaKinds.td
++++ clang/include/clang/Basic/DiagnosticSemaKinds.td
 @@ -548,6 +548,12 @@ def err_using_decl_conflict_reverse : Error<
  def note_using_decl : Note<"%select{|previous }0using declaration">;
  def err_using_decl_redeclaration_expansion : Error<
@@ -163,10 +163,10 @@ index 941f2cafc372..0581296ac802 100644
  
  def warn_access_decl_deprecated : Warning<
    "access declarations are deprecated; use using declarations instead">,
-diff --git a/clang/include/clang/Sema/Sema.h b/clang/include/clang/Sema/Sema.h
+diff --git clang/include/clang/Sema/Sema.h clang/include/clang/Sema/Sema.h
 index 16a7084f6b08..89d7730d2420 100644
---- a/clang/include/clang/Sema/Sema.h
-+++ b/clang/include/clang/Sema/Sema.h
+--- clang/include/clang/Sema/Sema.h
++++ clang/include/clang/Sema/Sema.h
 @@ -5399,11 +5399,14 @@ public:
                                 const DeclarationNameInfo &NameInfo,
                                 SourceLocation NameLoc);
@@ -187,10 +187,10 @@ index 16a7084f6b08..89d7730d2420 100644
    NamedDecl *BuildUsingPackDecl(NamedDecl *InstantiatedFrom,
                                  ArrayRef<NamedDecl *> Expansions);
  
-diff --git a/clang/include/clang/Serialization/ASTBitCodes.h b/clang/include/clang/Serialization/ASTBitCodes.h
+diff --git clang/include/clang/Serialization/ASTBitCodes.h clang/include/clang/Serialization/ASTBitCodes.h
 index c6f9f1d1a08f..737023e7d1dc 100644
---- a/clang/include/clang/Serialization/ASTBitCodes.h
-+++ b/clang/include/clang/Serialization/ASTBitCodes.h
+--- clang/include/clang/Serialization/ASTBitCodes.h
++++ clang/include/clang/Serialization/ASTBitCodes.h
 @@ -1423,6 +1423,9 @@ public:
        /// \brief A ConceptDecl record.
        DECL_CONCEPT,
@@ -201,10 +201,10 @@ index c6f9f1d1a08f..737023e7d1dc 100644
        /// \brief A StaticAssertDecl record.
        DECL_STATIC_ASSERT,
  
-diff --git a/clang/lib/AST/DeclBase.cpp b/clang/lib/AST/DeclBase.cpp
+diff --git clang/lib/AST/DeclBase.cpp clang/lib/AST/DeclBase.cpp
 index f4314d0bd961..7e5ace6c111b 100644
---- a/clang/lib/AST/DeclBase.cpp
-+++ b/clang/lib/AST/DeclBase.cpp
+--- clang/lib/AST/DeclBase.cpp
++++ clang/lib/AST/DeclBase.cpp
 @@ -812,6 +812,9 @@ unsigned Decl::getIdentifierNamespaceForKind(Kind DeclKind) {
      case TypeAliasTemplate:
        return IDNS_Ordinary | IDNS_Tag | IDNS_Type;
@@ -215,10 +215,10 @@ index f4314d0bd961..7e5ace6c111b 100644
      case OMPDeclareReduction:
        return IDNS_OMPReduction;
  
-diff --git a/clang/lib/AST/DeclCXX.cpp b/clang/lib/AST/DeclCXX.cpp
+diff --git clang/lib/AST/DeclCXX.cpp clang/lib/AST/DeclCXX.cpp
 index 6f1fd2f14ede..e7fa4849063f 100644
---- a/clang/lib/AST/DeclCXX.cpp
-+++ b/clang/lib/AST/DeclCXX.cpp
+--- clang/lib/AST/DeclCXX.cpp
++++ clang/lib/AST/DeclCXX.cpp
 @@ -3085,6 +3085,25 @@ UnresolvedUsingTypenameDecl::CreateDeserialized(ASTContext &C, unsigned ID) {
        SourceLocation(), nullptr, SourceLocation());
  }
@@ -245,10 +245,10 @@ index 6f1fd2f14ede..e7fa4849063f 100644
  void StaticAssertDecl::anchor() {}
  
  StaticAssertDecl *StaticAssertDecl::Create(ASTContext &C, DeclContext *DC,
-diff --git a/clang/lib/CodeGen/CGDecl.cpp b/clang/lib/CodeGen/CGDecl.cpp
+diff --git clang/lib/CodeGen/CGDecl.cpp clang/lib/CodeGen/CGDecl.cpp
 index 1729c7ed3c31..d149756c3f48 100644
---- a/clang/lib/CodeGen/CGDecl.cpp
-+++ b/clang/lib/CodeGen/CGDecl.cpp
+--- clang/lib/CodeGen/CGDecl.cpp
++++ clang/lib/CodeGen/CGDecl.cpp
 @@ -99,6 +99,7 @@ void CodeGenFunction::EmitDecl(const Decl &D) {
    case Decl::ConstructorUsingShadow:
    case Decl::ObjCTypeParam:
@@ -257,10 +257,10 @@ index 1729c7ed3c31..d149756c3f48 100644
      llvm_unreachable("Declaration should not be in declstmts!");
    case Decl::Function:  // void X();
    case Decl::Record:    // struct/union/class X;
-diff --git a/clang/lib/Sema/SemaDecl.cpp b/clang/lib/Sema/SemaDecl.cpp
+diff --git clang/lib/Sema/SemaDecl.cpp clang/lib/Sema/SemaDecl.cpp
 index 5b0417fa8859..1de95feb0f25 100644
---- a/clang/lib/Sema/SemaDecl.cpp
-+++ b/clang/lib/Sema/SemaDecl.cpp
+--- clang/lib/Sema/SemaDecl.cpp
++++ clang/lib/Sema/SemaDecl.cpp
 @@ -434,12 +434,14 @@ ParsedType Sema::getTypeName(const IdentifierInfo &II, SourceLocation NameLoc,
      // Look to see if we have a type anywhere in the list of results.
      for (LookupResult::iterator Res = Result.begin(), ResEnd = Result.end();
@@ -313,10 +313,10 @@ index 5b0417fa8859..1de95feb0f25 100644
    // We can have a type template here if we're classifying a template argument.
    if (isa<TemplateDecl>(FirstDecl) && !isa<FunctionTemplateDecl>(FirstDecl) &&
        !isa<VarTemplateDecl>(FirstDecl))
-diff --git a/clang/lib/Sema/SemaDeclAttr.cpp b/clang/lib/Sema/SemaDeclAttr.cpp
+diff --git clang/lib/Sema/SemaDeclAttr.cpp clang/lib/Sema/SemaDeclAttr.cpp
 index a9a2a19b4797..3cff1937e221 100644
---- a/clang/lib/Sema/SemaDeclAttr.cpp
-+++ b/clang/lib/Sema/SemaDeclAttr.cpp
+--- clang/lib/Sema/SemaDeclAttr.cpp
++++ clang/lib/Sema/SemaDeclAttr.cpp
 @@ -7450,6 +7450,10 @@ static void ProcessDeclAttribute(Sema &S, Scope *scope, Decl *D,
    case ParsedAttr::AT_UseHandle:
      handleHandleAttr<UseHandleAttr>(S, D, AL);
@@ -328,10 +328,10 @@ index a9a2a19b4797..3cff1937e221 100644
    }
  }
  
-diff --git a/clang/lib/Sema/SemaDeclCXX.cpp b/clang/lib/Sema/SemaDeclCXX.cpp
+diff --git clang/lib/Sema/SemaDeclCXX.cpp clang/lib/Sema/SemaDeclCXX.cpp
 index 22bf35dbd0cb..710fe3bce6ef 100644
---- a/clang/lib/Sema/SemaDeclCXX.cpp
-+++ b/clang/lib/Sema/SemaDeclCXX.cpp
+--- clang/lib/Sema/SemaDeclCXX.cpp
++++ clang/lib/Sema/SemaDeclCXX.cpp
 @@ -11495,10 +11495,11 @@ Decl *Sema::ActOnUsingDeclaration(Scope *S, AccessSpecifier AS,
      }
    }
@@ -428,10 +428,10 @@ index 22bf35dbd0cb..710fe3bce6ef 100644
        Diag(IdentLoc, diag::err_using_typename_non_type);
        for (LookupResult::iterator I = R.begin(), E = R.end(); I != E; ++I)
          Diag((*I)->getUnderlyingDecl()->getLocation(),
-diff --git a/clang/lib/Sema/SemaExpr.cpp b/clang/lib/Sema/SemaExpr.cpp
+diff --git clang/lib/Sema/SemaExpr.cpp clang/lib/Sema/SemaExpr.cpp
 index d301e6c732ab..807e5e33dd45 100644
---- a/clang/lib/Sema/SemaExpr.cpp
-+++ b/clang/lib/Sema/SemaExpr.cpp
+--- clang/lib/Sema/SemaExpr.cpp
++++ clang/lib/Sema/SemaExpr.cpp
 @@ -82,6 +82,9 @@ bool Sema::CanUseDecl(NamedDecl *D, bool TreatUnavailableAsInvalid) {
        cast<Decl>(CurContext)->getAvailability() != AR_Unavailable)
      return false;
@@ -478,10 +478,10 @@ index d301e6c732ab..807e5e33dd45 100644
    // Only create DeclRefExpr's for valid Decl's.
    if (VD->isInvalidDecl() && !AcceptInvalidDecl)
      return ExprError();
-diff --git a/clang/lib/Sema/SemaTemplateInstantiateDecl.cpp b/clang/lib/Sema/SemaTemplateInstantiateDecl.cpp
+diff --git clang/lib/Sema/SemaTemplateInstantiateDecl.cpp clang/lib/Sema/SemaTemplateInstantiateDecl.cpp
 index 7e6efe6105bf..248b8293eb41 100644
---- a/clang/lib/Sema/SemaTemplateInstantiateDecl.cpp
-+++ b/clang/lib/Sema/SemaTemplateInstantiateDecl.cpp
+--- clang/lib/Sema/SemaTemplateInstantiateDecl.cpp
++++ clang/lib/Sema/SemaTemplateInstantiateDecl.cpp
 @@ -3000,9 +3000,15 @@ Decl *TemplateDeclInstantiator::VisitUsingDecl(UsingDecl *D) {
        if (auto *BaseShadow = CUSD->getNominatedBaseClassShadowDecl())
          OldTarget = BaseShadow;
@@ -532,10 +532,10 @@ index 7e6efe6105bf..248b8293eb41 100644
  Decl *TemplateDeclInstantiator::VisitUsingPackDecl(UsingPackDecl *D) {
    SmallVector<NamedDecl*, 8> Expansions;
    for (auto *UD : D->expansions()) {
-diff --git a/clang/lib/Sema/TreeTransform.h b/clang/lib/Sema/TreeTransform.h
+diff --git clang/lib/Sema/TreeTransform.h clang/lib/Sema/TreeTransform.h
 index ae0e9f1119b4..091be27e3d17 100644
---- a/clang/lib/Sema/TreeTransform.h
-+++ b/clang/lib/Sema/TreeTransform.h
+--- clang/lib/Sema/TreeTransform.h
++++ clang/lib/Sema/TreeTransform.h
 @@ -14052,7 +14052,11 @@ QualType TreeTransform<Derived>::RebuildUnresolvedUsingType(SourceLocation Loc,
  
      // A valid resolved using typename decl points to exactly one type decl.
@@ -549,10 +549,10 @@ index ae0e9f1119b4..091be27e3d17 100644
    } else {
      assert(isa<UnresolvedUsingTypenameDecl>(D) &&
             "UnresolvedUsingTypenameDecl transformed to non-using decl");
-diff --git a/clang/lib/Serialization/ASTCommon.cpp b/clang/lib/Serialization/ASTCommon.cpp
+diff --git clang/lib/Serialization/ASTCommon.cpp clang/lib/Serialization/ASTCommon.cpp
 index bf583b02f96b..165d96fd4d85 100644
---- a/clang/lib/Serialization/ASTCommon.cpp
-+++ b/clang/lib/Serialization/ASTCommon.cpp
+--- clang/lib/Serialization/ASTCommon.cpp
++++ clang/lib/Serialization/ASTCommon.cpp
 @@ -416,6 +416,7 @@ bool serialization::isRedeclarableDeclKind(unsigned Kind) {
    case Decl::Concept:
    case Decl::LifetimeExtendedTemporary:
@@ -561,10 +561,10 @@ index bf583b02f96b..165d96fd4d85 100644
      return false;
  
    // These indirectly derive from Redeclarable<T> but are not actually
-diff --git a/clang/lib/Serialization/ASTReaderDecl.cpp b/clang/lib/Serialization/ASTReaderDecl.cpp
+diff --git clang/lib/Serialization/ASTReaderDecl.cpp clang/lib/Serialization/ASTReaderDecl.cpp
 index c0bf240464f7..c2390403900c 100644
---- a/clang/lib/Serialization/ASTReaderDecl.cpp
-+++ b/clang/lib/Serialization/ASTReaderDecl.cpp
+--- clang/lib/Serialization/ASTReaderDecl.cpp
++++ clang/lib/Serialization/ASTReaderDecl.cpp
 @@ -325,6 +325,7 @@ namespace clang {
      void VisitTypedefDecl(TypedefDecl *TD);
      void VisitTypeAliasDecl(TypeAliasDecl *TD);
@@ -595,10 +595,10 @@ index c0bf240464f7..c2390403900c 100644
    case DECL_CXX_RECORD:
      D = CXXRecordDecl::CreateDeserialized(Context, ID);
      break;
-diff --git a/clang/lib/Serialization/ASTWriterDecl.cpp b/clang/lib/Serialization/ASTWriterDecl.cpp
+diff --git clang/lib/Serialization/ASTWriterDecl.cpp clang/lib/Serialization/ASTWriterDecl.cpp
 index eecdf89c791a..7b65fdd7eb8d 100644
---- a/clang/lib/Serialization/ASTWriterDecl.cpp
-+++ b/clang/lib/Serialization/ASTWriterDecl.cpp
+--- clang/lib/Serialization/ASTWriterDecl.cpp
++++ clang/lib/Serialization/ASTWriterDecl.cpp
 @@ -69,6 +69,7 @@ namespace clang {
      void VisitTypedefDecl(TypedefDecl *D);
      void VisitTypeAliasDecl(TypeAliasDecl *D);
@@ -620,11 +620,11 @@ index eecdf89c791a..7b65fdd7eb8d 100644
  void ASTDeclWriter::VisitCXXRecordDecl(CXXRecordDecl *D) {
    VisitRecordDecl(D);
  
-diff --git a/clang/test/Parser/using-if-exists-attr.cpp b/clang/test/Parser/using-if-exists-attr.cpp
+diff --git clang/test/Parser/using-if-exists-attr.cpp clang/test/Parser/using-if-exists-attr.cpp
 new file mode 100644
 index 000000000000..ba34b9beb6bc
 --- /dev/null
-+++ b/clang/test/Parser/using-if-exists-attr.cpp
++++ clang/test/Parser/using-if-exists-attr.cpp
 @@ -0,0 +1,27 @@
 +// RUN: %clang_cc1 -std=c++20 -fsyntax-only %s -pedantic -verify
 +
@@ -653,10 +653,10 @@ index 000000000000..ba34b9beb6bc
 +  using Base::y [[clang::using_if_exists]];          // expected-warning {{ISO C++ does not allow an attribute list to appear here}}
 +  [[clang::using_if_exists]] using Base::z, Base::q; // expected-warning {{C++ does not allow an attribute list to appear here}}
 +};
-diff --git a/clang/test/SemaCXX/attr-deprecated.cpp b/clang/test/SemaCXX/attr-deprecated.cpp
+diff --git clang/test/SemaCXX/attr-deprecated.cpp clang/test/SemaCXX/attr-deprecated.cpp
 index 5ba55f0c23b5..5c427ad8fef1 100644
---- a/clang/test/SemaCXX/attr-deprecated.cpp
-+++ b/clang/test/SemaCXX/attr-deprecated.cpp
+--- clang/test/SemaCXX/attr-deprecated.cpp
++++ clang/test/SemaCXX/attr-deprecated.cpp
 @@ -256,3 +256,15 @@ typedef struct TDS {
  } TDS __attribute__((deprecated)); // expected-note {{'TDS' has been explicitly marked deprecated here}}
  TDS tds; // expected-warning {{'TDS' is deprecated}}
@@ -673,11 +673,11 @@ index 5ba55f0c23b5..5c427ad8fef1 100644
 +};
 +D<A> da; // expected-note {{in instantiation of template class}}
 +} // namespace test8
-diff --git a/clang/test/SemaCXX/using-if-exists.cpp b/clang/test/SemaCXX/using-if-exists.cpp
+diff --git clang/test/SemaCXX/using-if-exists.cpp clang/test/SemaCXX/using-if-exists.cpp
 new file mode 100644
 index 000000000000..36fbbb171fb9
 --- /dev/null
-+++ b/clang/test/SemaCXX/using-if-exists.cpp
++++ clang/test/SemaCXX/using-if-exists.cpp
 @@ -0,0 +1,226 @@
 +// RUN: %clang_cc1 -std=c++20 -fsyntax-only %s -verify
 +
@@ -905,10 +905,10 @@ index 000000000000..36fbbb171fb9
 +  size = fake_printf();
 +  size = std::fake_printf();
 +}
-diff --git a/clang/tools/libclang/CIndex.cpp b/clang/tools/libclang/CIndex.cpp
+diff --git clang/tools/libclang/CIndex.cpp clang/tools/libclang/CIndex.cpp
 index 93f9797a965e..e533703e5158 100644
---- a/clang/tools/libclang/CIndex.cpp
-+++ b/clang/tools/libclang/CIndex.cpp
+--- clang/tools/libclang/CIndex.cpp
++++ clang/tools/libclang/CIndex.cpp
 @@ -6406,6 +6406,7 @@ CXCursor clang_getCursorDefinition(CXCursor C) {
    case Decl::Concept:
    case Decl::LifetimeExtendedTemporary:
@@ -918,5 +918,5 @@ index 93f9797a965e..e533703e5158 100644
  
    // Declaration kinds that don't make any sense here, but are
 -- 
-2.37.2
+2.43.0
 

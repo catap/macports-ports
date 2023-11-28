@@ -1,4 +1,4 @@
-From b4c19d923fa1fcff5c08d5bdd211997a1e4ba9a7 Mon Sep 17 00:00:00 2001
+From 7d6e8760268ef7f681f058c1123f10d0ea2ff407 Mon Sep 17 00:00:00 2001
 From: "Kirill A. Korinsky" <kirill@korins.ky>
 Date: Wed, 17 Aug 2022 14:03:50 +0200
 Subject: [PATCH] 10.5 and less: compiler-rt work around no libdispatch before
@@ -8,10 +8,10 @@ Subject: [PATCH] 10.5 and less: compiler-rt work around no libdispatch before
  compiler-rt/lib/builtins/os_version_check.c | 13 ++++++++++++-
  1 file changed, 12 insertions(+), 1 deletion(-)
 
-diff --git a/compiler-rt/lib/builtins/os_version_check.c b/compiler-rt/lib/builtins/os_version_check.c
+diff --git compiler-rt/lib/builtins/os_version_check.c compiler-rt/lib/builtins/os_version_check.c
 index 3794b979434c..553e809a492c 100644
---- a/compiler-rt/lib/builtins/os_version_check.c
-+++ b/compiler-rt/lib/builtins/os_version_check.c
+--- compiler-rt/lib/builtins/os_version_check.c
++++ compiler-rt/lib/builtins/os_version_check.c
 @@ -13,8 +13,11 @@
  
  #ifdef __APPLE__
@@ -50,5 +50,5 @@ index 3794b979434c..553e809a492c 100644
    if (Major < GlobalMajor)
      return 1;
 -- 
-2.37.2
+2.43.0
 

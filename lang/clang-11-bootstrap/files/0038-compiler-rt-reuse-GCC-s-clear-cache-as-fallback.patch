@@ -1,0 +1,39 @@
+From f99d1205e95f9c7b766873c8bbf1f63b6e88fee6 Mon Sep 17 00:00:00 2001
+From: "Kirill A. Korinsky" <kirill@korins.ky>
+Date: Tue, 2 May 2023 10:59:10 +0200
+Subject: [PATCH] [compiler-rt] reuse GCC's clear cache as fallback
+
+---
+ compiler-rt/lib/builtins/clear_cache.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git compiler-rt/lib/builtins/clear_cache.c compiler-rt/lib/builtins/clear_cache.c
+index 29e31f55d499..1cf33a50c528 100644
+--- compiler-rt/lib/builtins/clear_cache.c
++++ compiler-rt/lib/builtins/clear_cache.c
+@@ -10,7 +10,7 @@
+ #include <assert.h>
+ #include <stddef.h>
+ 
+-#if __APPLE__
++#if defined(__APPLE__)  && __has_include(<libkern/OSCacheControl.h>)
+ #include <libkern/OSCacheControl.h>
+ #endif
+ 
+@@ -158,9 +158,12 @@ void __clear_cache(void *start, void *end) {
+                    : "r"(start_reg), "r"(end_reg), "r"(flags), "r"(syscall_nr));
+   assert(start_reg == 0 && "Cache flush syscall failed.");
+ #else
+-#if __APPLE__
++#if defined(__APPLE__)  && __has_include(<libkern/OSCacheControl.h>)
+   // On Darwin, sys_icache_invalidate() provides this functionality
+   sys_icache_invalidate(start, end - start);
++#elif defined(__GNUC__) && !defined(__clang__)
++  // __builtin___clear_cache() from GCC provides this functionality
++  __builtin___clear_cache(start, end - start);
+ #else
+   compilerrt_abort();
+ #endif
+-- 
+2.43.0
+

@@ -1,0 +1,39 @@
+From 22d9347f06cd1b1f7c799f83b2693bc91b6713ba Mon Sep 17 00:00:00 2001
+From: "Kirill A. Korinsky" <kirill@korins.ky>
+Date: Tue, 2 May 2023 22:16:09 +0200
+Subject: [PATCH] lib/Support/Unix/Path.inc: use copyfile when it is available
+
+Tiger and earlier versions of darwin do not support this.
+---
+ llvm/lib/Support/Unix/Path.inc | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git llvm/lib/Support/Unix/Path.inc llvm/lib/Support/Unix/Path.inc
+index 9be4eac0a1b5..4c2c88919018 100644
+--- llvm/lib/Support/Unix/Path.inc
++++ llvm/lib/Support/Unix/Path.inc
+@@ -37,10 +37,12 @@
+ #ifdef __APPLE__
+ #include <mach-o/dyld.h>
+ #include <sys/attr.h>
++#if __has_include(<copyfile.h>)
+ #include <copyfile.h>
+ #ifndef COPYFILE_CLONE
+ #define COPYFILE_CLONE		(1<<24)
+ #endif
++#endif
+ #elif defined(__FreeBSD__)
+ #include <osreldate.h>
+ #if __FreeBSD_version >= 1300057
+@@ -1282,7 +1284,7 @@ void system_temp_directory(bool ErasedOnReboot, SmallVectorImpl<char> &Result) {
+ 
+ namespace fs {
+ 
+-#ifdef __APPLE__
++#if defined(__APPLE__) && defined(COPYFILE_DATA)
+ /// This implementation tries to perform an APFS CoW clone of the file,
+ /// which can be much faster and uses less space.
+ /// Unfortunately fcopyfile(3) does not support COPYFILE_CLONE, so the
+-- 
+2.43.0
+

@@ -1,4 +1,4 @@
-From 60cd288acdf48e3cd3f19eccf776e8fe23fcc04f Mon Sep 17 00:00:00 2001
+From 225628416fb78da3f951af8896cc0f1be87221f9 Mon Sep 17 00:00:00 2001
 From: "Kirill A. Korinsky" <kirill@korins.ky>
 Date: Wed, 17 Aug 2022 16:09:26 +0200
 Subject: [PATCH] [compiler-rt] allow to define required archs
@@ -8,10 +8,10 @@ Subject: [PATCH] [compiler-rt] allow to define required archs
  compiler-rt/cmake/config-ix.cmake         |  8 ++++++--
  2 files changed, 16 insertions(+), 10 deletions(-)
 
-diff --git a/compiler-rt/cmake/builtin-config-ix.cmake b/compiler-rt/cmake/builtin-config-ix.cmake
+diff --git compiler-rt/cmake/builtin-config-ix.cmake compiler-rt/cmake/builtin-config-ix.cmake
 index 8de901513beb..904d8ca93fca 100644
---- a/compiler-rt/cmake/builtin-config-ix.cmake
-+++ b/compiler-rt/cmake/builtin-config-ix.cmake
+--- compiler-rt/cmake/builtin-config-ix.cmake
++++ compiler-rt/cmake/builtin-config-ix.cmake
 @@ -84,14 +84,16 @@ if(APPLE)
    set(DARWIN_osx_BUILTIN_MIN_VER 10.5)
    set(DARWIN_osx_BUILTIN_MIN_VER_FLAG
@@ -37,10 +37,10 @@ index 8de901513beb..904d8ca93fca 100644
  
    if(COMPILER_RT_ENABLE_IOS)
      list(APPEND DARWIN_EMBEDDED_PLATFORMS ios)
-diff --git a/compiler-rt/cmake/config-ix.cmake b/compiler-rt/cmake/config-ix.cmake
+diff --git compiler-rt/cmake/config-ix.cmake compiler-rt/cmake/config-ix.cmake
 index 0e035afb9f10..67d8d64da790 100644
---- a/compiler-rt/cmake/config-ix.cmake
-+++ b/compiler-rt/cmake/config-ix.cmake
+--- compiler-rt/cmake/config-ix.cmake
++++ compiler-rt/cmake/config-ix.cmake
 @@ -431,8 +431,12 @@ if(APPLE)
      list(APPEND DARWIN_osx_LINK_FLAGS -isysroot ${DARWIN_osx_SYSROOT})
    endif()
@@ -57,5 +57,5 @@ index 0e035afb9f10..67d8d64da790 100644
  
    if(NOT MACOSX_VERSION_MIN_FLAG)
 -- 
-2.37.2
+2.43.0
 

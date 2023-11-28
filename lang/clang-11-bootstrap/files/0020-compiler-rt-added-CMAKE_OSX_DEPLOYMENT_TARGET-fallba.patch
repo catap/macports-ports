@@ -1,4 +1,4 @@
-From 0691517ced61dc1789b8efbee301f46756f7cecb Mon Sep 17 00:00:00 2001
+From 5f36efc5b7f7057051881b07bcfb3408b11b4c68 Mon Sep 17 00:00:00 2001
 From: "Kirill A. Korinsky" <kirill@korins.ky>
 Date: Wed, 17 Aug 2022 14:13:11 +0200
 Subject: [PATCH] compiler-rt: added CMAKE_OSX_DEPLOYMENT_TARGET fallback
@@ -7,10 +7,10 @@ Subject: [PATCH] compiler-rt: added CMAKE_OSX_DEPLOYMENT_TARGET fallback
  .../cmake/Modules/CompilerRTDarwinUtils.cmake      | 14 +++++---------
  1 file changed, 5 insertions(+), 9 deletions(-)
 
-diff --git a/compiler-rt/cmake/Modules/CompilerRTDarwinUtils.cmake b/compiler-rt/cmake/Modules/CompilerRTDarwinUtils.cmake
+diff --git compiler-rt/cmake/Modules/CompilerRTDarwinUtils.cmake compiler-rt/cmake/Modules/CompilerRTDarwinUtils.cmake
 index be8d7e733c7a..ab0b0a43f2b6 100644
---- a/compiler-rt/cmake/Modules/CompilerRTDarwinUtils.cmake
-+++ b/compiler-rt/cmake/Modules/CompilerRTDarwinUtils.cmake
+--- compiler-rt/cmake/Modules/CompilerRTDarwinUtils.cmake
++++ compiler-rt/cmake/Modules/CompilerRTDarwinUtils.cmake
 @@ -69,15 +69,6 @@ function(find_darwin_sdk_version var sdk_name)
        ERROR_FILE /dev/null
      )
@@ -40,5 +40,5 @@ index be8d7e733c7a..ab0b0a43f2b6 100644
          message(STATUS "Disabling i386 slice for ${valid_archs}")
          list(REMOVE_ITEM archs "i386")
 -- 
-2.37.2
+2.43.0
 

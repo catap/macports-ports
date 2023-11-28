@@ -8,10 +8,10 @@ Signed-off-by: Jeremy Huddleston Sequoia <jeremyhu@apple.com>
  llvm/lib/Support/Unix/Threading.inc | 2 ++
  1 file changed, 2 insertions(+)
 
-diff --git a/llvm/lib/Support/Unix/Threading.inc b/llvm/lib/Support/Unix/Threading.inc
+diff --git llvm/lib/Support/Unix/Threading.inc llvm/lib/Support/Unix/Threading.inc
 index 2d0aacabf092..78ef46cd1a4c 100644
---- a/llvm/lib/Support/Unix/Threading.inc
-+++ b/llvm/lib/Support/Unix/Threading.inc
+--- llvm/lib/Support/Unix/Threading.inc
++++ llvm/lib/Support/Unix/Threading.inc
 @@ -175,8 +175,10 @@ void llvm::set_thread_name(const Twine &Name) {
    ::pthread_setname_np(::pthread_self(), "%s",
      const_cast<char *>(NameStr.data()));
@@ -24,5 +24,5 @@ index 2d0aacabf092..78ef46cd1a4c 100644
  
  void llvm::get_thread_name(SmallVectorImpl<char> &Name) {
 -- 
-2.37.2
+2.43.0
 

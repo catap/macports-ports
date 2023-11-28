@@ -7,10 +7,10 @@ Subject: [PATCH] Fix build issues pre-Lion due to missing a memmem definition
  compiler-rt/lib/fuzzer/FuzzerUtilPosix.cpp | 34 ++++++++++++++++++++++
  1 file changed, 34 insertions(+)
 
-diff --git a/compiler-rt/lib/fuzzer/FuzzerUtilPosix.cpp b/compiler-rt/lib/fuzzer/FuzzerUtilPosix.cpp
+diff --git compiler-rt/lib/fuzzer/FuzzerUtilPosix.cpp compiler-rt/lib/fuzzer/FuzzerUtilPosix.cpp
 index fc57b724db10..f538696facff 100644
---- a/compiler-rt/lib/fuzzer/FuzzerUtilPosix.cpp
-+++ b/compiler-rt/lib/fuzzer/FuzzerUtilPosix.cpp
+--- compiler-rt/lib/fuzzer/FuzzerUtilPosix.cpp
++++ compiler-rt/lib/fuzzer/FuzzerUtilPosix.cpp
 @@ -27,6 +27,40 @@
  #include <thread>
  #include <unistd.h>
@@ -53,5 +53,5 @@ index fc57b724db10..f538696facff 100644
  
  static void AlarmHandler(int, siginfo_t *, void *) {
 -- 
-2.37.2
+2.43.0
 

@@ -1,4 +1,4 @@
-From c1a2bd1699317f16c833616863ccb2888a36084e Mon Sep 17 00:00:00 2001
+From 9d0b07b7de1cd9bdf63fc0db63f37e7678771e6b Mon Sep 17 00:00:00 2001
 From: Jeremy Huddleston Sequoia <jeremyhu@apple.com>
 Date: Thu, 20 Jul 2017 17:15:35 -0700
 Subject: [PATCH] Fix float.h to work on Snow Leopard and earlier
@@ -11,10 +11,10 @@ Signed-off-by: Jeremy Huddleston Sequoia <jeremyhu@apple.com>
  clang/lib/Headers/float.h | 7 ++++++-
  1 file changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/clang/lib/Headers/float.h b/clang/lib/Headers/float.h
+diff --git clang/lib/Headers/float.h clang/lib/Headers/float.h
 index ed610b24aa10..9dc3c0a12a03 100644
---- a/clang/lib/Headers/float.h
-+++ b/clang/lib/Headers/float.h
+--- clang/lib/Headers/float.h
++++ clang/lib/Headers/float.h
 @@ -17,7 +17,12 @@
   * Also fall back on Darwin to allow additional definitions and
   * implementation-defined values.
@@ -30,5 +30,5 @@ index ed610b24aa10..9dc3c0a12a03 100644
  
  /* Prior to Apple's 10.7 SDK, float.h SDK header used to apply an extra level
 -- 
-2.37.2
+2.43.0
 

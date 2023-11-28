@@ -1,4 +1,4 @@
-From da46206ab118338f438756e7d3bf2cd87f1badb0 Mon Sep 17 00:00:00 2001
+From cdff0d3c4c629a356e4eb71dba6ffc8ecf86316c Mon Sep 17 00:00:00 2001
 From: "Kirill A. Korinsky" <kirill@korins.ky>
 Date: Tue, 30 Aug 2022 14:35:02 +0200
 Subject: [PATCH] [clang][Parse] Add parsing support for C++ attributes on
@@ -21,10 +21,10 @@ This is backport of https://reviews.llvm.org/D91630 to clang-11
  12 files changed, 131 insertions(+), 34 deletions(-)
  create mode 100644 clang/test/SemaCXX/cxx11-attributes-on-using-declaration.cpp
 
-diff --git a/clang/docs/LanguageExtensions.rst b/clang/docs/LanguageExtensions.rst
+diff --git clang/docs/LanguageExtensions.rst clang/docs/LanguageExtensions.rst
 index 06ecc186c7dc..7408333be64f 100644
---- a/clang/docs/LanguageExtensions.rst
-+++ b/clang/docs/LanguageExtensions.rst
+--- clang/docs/LanguageExtensions.rst
++++ clang/docs/LanguageExtensions.rst
 @@ -619,6 +619,20 @@ Attributes on the ``enum`` declaration do not apply to individual enumerators.
  
  Query for this feature with ``__has_extension(enumerator_attributes)``.
@@ -46,10 +46,10 @@ index 06ecc186c7dc..7408333be64f 100644
  'User-Specified' System Frameworks
  ==================================
  
-diff --git a/clang/docs/ReleaseNotes.rst b/clang/docs/ReleaseNotes.rst
+diff --git clang/docs/ReleaseNotes.rst clang/docs/ReleaseNotes.rst
 index 0ccaa7a82121..720e941e3b87 100644
---- a/clang/docs/ReleaseNotes.rst
-+++ b/clang/docs/ReleaseNotes.rst
+--- clang/docs/ReleaseNotes.rst
++++ clang/docs/ReleaseNotes.rst
 @@ -302,6 +302,9 @@ Attribute Changes in Clang
    `Clang Plugins <ClangPlugins.html#defining-attributes>`_ documentation for
    details.
@@ -60,10 +60,10 @@ index 0ccaa7a82121..720e941e3b87 100644
  Windows Support
  ---------------
  
-diff --git a/clang/include/clang/Basic/DiagnosticParseKinds.td b/clang/include/clang/Basic/DiagnosticParseKinds.td
+diff --git clang/include/clang/Basic/DiagnosticParseKinds.td clang/include/clang/Basic/DiagnosticParseKinds.td
 index 1038a4119d4c..a89e6067b2b5 100644
---- a/clang/include/clang/Basic/DiagnosticParseKinds.td
-+++ b/clang/include/clang/Basic/DiagnosticParseKinds.td
+--- clang/include/clang/Basic/DiagnosticParseKinds.td
++++ clang/include/clang/Basic/DiagnosticParseKinds.td
 @@ -672,6 +672,9 @@ def ext_using_attribute_ns : ExtWarn<
  def err_using_attribute_ns_conflict : Error<
    "attribute with scope specifier cannot follow default scope specifier">;
@@ -74,10 +74,10 @@ index 1038a4119d4c..a89e6067b2b5 100644
  def err_attributes_misplaced : Error<"misplaced attributes; expected attributes here">;
  def err_l_square_l_square_not_attribute : Error<
    "C++11 only allows consecutive left square brackets when "
-diff --git a/clang/include/clang/Basic/DiagnosticSemaKinds.td b/clang/include/clang/Basic/DiagnosticSemaKinds.td
+diff --git clang/include/clang/Basic/DiagnosticSemaKinds.td clang/include/clang/Basic/DiagnosticSemaKinds.td
 index 0581296ac802..2f4511e4110f 100644
---- a/clang/include/clang/Basic/DiagnosticSemaKinds.td
-+++ b/clang/include/clang/Basic/DiagnosticSemaKinds.td
+--- clang/include/clang/Basic/DiagnosticSemaKinds.td
++++ clang/include/clang/Basic/DiagnosticSemaKinds.td
 @@ -3824,6 +3824,9 @@ def warn_attribute_sentinel_named_arguments : Warning<
  def warn_attribute_sentinel_not_variadic : Warning<
    "'sentinel' attribute only supported for variadic %select{functions|blocks}0">,
@@ -88,10 +88,10 @@ index 0581296ac802..2f4511e4110f 100644
  def err_attribute_sentinel_less_than_zero : Error<
    "'sentinel' parameter 1 less than zero">;
  def err_attribute_sentinel_not_zero_or_one : Error<
-diff --git a/clang/include/clang/Basic/Features.def b/clang/include/clang/Basic/Features.def
+diff --git clang/include/clang/Basic/Features.def clang/include/clang/Basic/Features.def
 index 999bcb7e2e29..7234eceb493e 100644
---- a/clang/include/clang/Basic/Features.def
-+++ b/clang/include/clang/Basic/Features.def
+--- clang/include/clang/Basic/Features.def
++++ clang/include/clang/Basic/Features.def
 @@ -255,6 +255,7 @@ EXTENSION(pragma_clang_attribute_external_declaration, true)
  EXTENSION(gnu_asm, LangOpts.GNUAsm)
  EXTENSION(gnu_asm_goto_with_outputs, LangOpts.GNUAsm)
@@ -100,10 +100,10 @@ index 999bcb7e2e29..7234eceb493e 100644
  
  #undef EXTENSION
  #undef FEATURE
-diff --git a/clang/include/clang/Parse/Parser.h b/clang/include/clang/Parse/Parser.h
+diff --git clang/include/clang/Parse/Parser.h clang/include/clang/Parse/Parser.h
 index e809d87b59a0..8a7418389933 100644
---- a/clang/include/clang/Parse/Parser.h
-+++ b/clang/include/clang/Parse/Parser.h
+--- clang/include/clang/Parse/Parser.h
++++ clang/include/clang/Parse/Parser.h
 @@ -2631,6 +2631,10 @@ private:
    /// locations where attributes are not allowed.
    void DiagnoseAndSkipCXX11Attributes();
@@ -123,10 +123,10 @@ index e809d87b59a0..8a7418389933 100644
                                         AccessSpecifier AS = AS_none);
    Decl *ParseAliasDeclarationAfterDeclarator(
        const ParsedTemplateInfo &TemplateInfo, SourceLocation UsingLoc,
-diff --git a/clang/lib/Parse/ParseDecl.cpp b/clang/lib/Parse/ParseDecl.cpp
+diff --git clang/lib/Parse/ParseDecl.cpp clang/lib/Parse/ParseDecl.cpp
 index c87d240a8206..8967aa74feda 100644
---- a/clang/lib/Parse/ParseDecl.cpp
-+++ b/clang/lib/Parse/ParseDecl.cpp
+--- clang/lib/Parse/ParseDecl.cpp
++++ clang/lib/Parse/ParseDecl.cpp
 @@ -1549,6 +1549,13 @@ void Parser::ProhibitCXX11Attributes(ParsedAttributesWithRange &Attrs,
    }
  }
@@ -141,10 +141,10 @@ index c87d240a8206..8967aa74feda 100644
  // Usually, `__attribute__((attrib)) class Foo {} var` means that attribute
  // applies to var, not the type Foo.
  // As an exception to the rule, __declspec(align(...)) before the
-diff --git a/clang/lib/Parse/ParseDeclCXX.cpp b/clang/lib/Parse/ParseDeclCXX.cpp
+diff --git clang/lib/Parse/ParseDeclCXX.cpp clang/lib/Parse/ParseDeclCXX.cpp
 index ddcbb5615fee..f4b774f7071d 100644
---- a/clang/lib/Parse/ParseDeclCXX.cpp
-+++ b/clang/lib/Parse/ParseDeclCXX.cpp
+--- clang/lib/Parse/ParseDeclCXX.cpp
++++ clang/lib/Parse/ParseDeclCXX.cpp
 @@ -497,11 +497,7 @@ Parser::ParseUsingDirectiveOrDeclaration(DeclaratorContext Context,
    }
  
@@ -263,10 +263,10 @@ index ddcbb5615fee..f4b774f7071d 100644
    }
  
    // Hold late-parsed attributes so we can attach a Decl to them later.
-diff --git a/clang/lib/Sema/SemaDeclAttr.cpp b/clang/lib/Sema/SemaDeclAttr.cpp
+diff --git clang/lib/Sema/SemaDeclAttr.cpp clang/lib/Sema/SemaDeclAttr.cpp
 index 3cff1937e221..92f0c314635b 100644
---- a/clang/lib/Sema/SemaDeclAttr.cpp
-+++ b/clang/lib/Sema/SemaDeclAttr.cpp
+--- clang/lib/Sema/SemaDeclAttr.cpp
++++ clang/lib/Sema/SemaDeclAttr.cpp
 @@ -2416,6 +2416,13 @@ AvailabilityAttr *Sema::mergeAvailabilityAttr(
  }
  
@@ -293,10 +293,10 @@ index 3cff1937e221..92f0c314635b 100644
    }
  
    // Handle the cases where the attribute has a text message.
-diff --git a/clang/lib/Sema/SemaDeclCXX.cpp b/clang/lib/Sema/SemaDeclCXX.cpp
+diff --git clang/lib/Sema/SemaDeclCXX.cpp clang/lib/Sema/SemaDeclCXX.cpp
 index 710fe3bce6ef..119f61a1f2d9 100644
---- a/clang/lib/Sema/SemaDeclCXX.cpp
-+++ b/clang/lib/Sema/SemaDeclCXX.cpp
+--- clang/lib/Sema/SemaDeclCXX.cpp
++++ clang/lib/Sema/SemaDeclCXX.cpp
 @@ -11638,7 +11638,7 @@ bool Sema::CheckUsingShadowDecl(UsingDecl *Using, NamedDecl *Orig,
    // Always emit a diagnostic for a mismatch between an unresolved
    // using_if_exists and a resolved using declaration in either direction.
@@ -333,10 +333,10 @@ index 710fe3bce6ef..119f61a1f2d9 100644
      UD->setInvalidDecl(Invalid);
      return UD;
    };
-diff --git a/clang/test/Parser/cxx0x-attributes.cpp b/clang/test/Parser/cxx0x-attributes.cpp
+diff --git clang/test/Parser/cxx0x-attributes.cpp clang/test/Parser/cxx0x-attributes.cpp
 index 101e03845b8f..f01fe389a992 100644
---- a/clang/test/Parser/cxx0x-attributes.cpp
-+++ b/clang/test/Parser/cxx0x-attributes.cpp
+--- clang/test/Parser/cxx0x-attributes.cpp
++++ clang/test/Parser/cxx0x-attributes.cpp
 @@ -131,12 +131,12 @@ extern "C++" [[]] { } // expected-error {{an attribute list cannot appear here}}
  [[]] static_assert(true, ""); //expected-error {{an attribute list cannot appear here}}
  [[]] asm(""); // expected-error {{an attribute list cannot appear here}}
@@ -370,11 +370,11 @@ index 101e03845b8f..f01fe389a992 100644
  using [[]] ns::i; // expected-error {{an attribute list cannot appear here}}
  using T [[unknown]] = int; // expected-warning {{unknown attribute 'unknown' ignored}}
  using T [[noreturn]] = int; // expected-error {{'noreturn' attribute only applies to functions}}
-diff --git a/clang/test/SemaCXX/cxx11-attributes-on-using-declaration.cpp b/clang/test/SemaCXX/cxx11-attributes-on-using-declaration.cpp
+diff --git clang/test/SemaCXX/cxx11-attributes-on-using-declaration.cpp clang/test/SemaCXX/cxx11-attributes-on-using-declaration.cpp
 new file mode 100644
 index 000000000000..5823ba7bfc2f
 --- /dev/null
-+++ b/clang/test/SemaCXX/cxx11-attributes-on-using-declaration.cpp
++++ clang/test/SemaCXX/cxx11-attributes-on-using-declaration.cpp
 @@ -0,0 +1,42 @@
 +// RUN: %clang_cc1 -pedantic -triple x86_64-apple-macos11 -std=c++20 -fsyntax-only -verify %s
 +
@@ -419,5 +419,5 @@ index 000000000000..5823ba7bfc2f
 +DepBase1<Base> db1;
 +DepBase2<Base> db2;
 -- 
-2.37.2
+2.43.0
 

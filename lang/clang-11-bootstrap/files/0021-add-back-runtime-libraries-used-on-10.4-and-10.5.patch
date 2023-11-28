@@ -1,4 +1,4 @@
-From ba3d665b91d33f808ffd39e9ee4675b72e564526 Mon Sep 17 00:00:00 2001
+From 753a30635b781a17fb1b66aa8a4f231511491fe1 Mon Sep 17 00:00:00 2001
 From: "Kirill A. Korinsky" <kirill@korins.ky>
 Date: Wed, 17 Aug 2022 14:14:50 +0200
 Subject: [PATCH] add back runtime libraries used on 10.4 and 10.5
@@ -18,10 +18,10 @@ it may be easiest to just add Tiger functions to libclang_rt.osx.a directly
  clang/lib/Driver/ToolChains/Darwin.cpp | 6 ++++++
  1 file changed, 6 insertions(+)
 
-diff --git a/clang/lib/Driver/ToolChains/Darwin.cpp b/clang/lib/Driver/ToolChains/Darwin.cpp
+diff --git clang/lib/Driver/ToolChains/Darwin.cpp clang/lib/Driver/ToolChains/Darwin.cpp
 index d9dde5adc24c..2219c7a7374c 100644
---- a/clang/lib/Driver/ToolChains/Darwin.cpp
-+++ b/clang/lib/Driver/ToolChains/Darwin.cpp
+--- clang/lib/Driver/ToolChains/Darwin.cpp
++++ clang/lib/Driver/ToolChains/Darwin.cpp
 @@ -1313,6 +1313,12 @@ void DarwinClang::AddLinkRuntimeLibArgs(const ArgList &Args,
          getTriple().getArch() != llvm::Triple::aarch64)
        CmdArgs.push_back("-lgcc_s.1");
@@ -36,5 +36,5 @@ index d9dde5adc24c..2219c7a7374c 100644
  }
  
 -- 
-2.37.2
+2.43.0
 

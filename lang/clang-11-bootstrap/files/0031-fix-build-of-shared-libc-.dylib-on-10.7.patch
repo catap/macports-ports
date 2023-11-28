@@ -1,4 +1,4 @@
-From 2619c3115f82a504540780ff29d5c932007d7ac3 Mon Sep 17 00:00:00 2001
+From cf2893616b241be858c11ac586a70d7b57a5107b Mon Sep 17 00:00:00 2001
 From: "Kirill A. Korinsky" <kirill@korins.ky>
 Date: Wed, 17 Aug 2022 15:27:16 +0200
 Subject: [PATCH] fix build of shared libc++.dylib on < 10.7
@@ -9,10 +9,10 @@ but reexport_library is, and that is what was used previously
  libcxx/src/CMakeLists.txt | 8 +++++---
  1 file changed, 5 insertions(+), 3 deletions(-)
 
-diff --git a/libcxx/src/CMakeLists.txt b/libcxx/src/CMakeLists.txt
+diff --git libcxx/src/CMakeLists.txt libcxx/src/CMakeLists.txt
 index 2001c09761d9..ee3f9a4ad0d7 100644
---- a/libcxx/src/CMakeLists.txt
-+++ b/libcxx/src/CMakeLists.txt
+--- libcxx/src/CMakeLists.txt
++++ libcxx/src/CMakeLists.txt
 @@ -209,11 +209,11 @@ if (LIBCXX_ENABLE_SHARED)
    if (LIBCXX_OSX_REEXPORT_LIBCXXABI_SYMBOLS)
      target_link_libraries(cxx_shared PRIVATE
@@ -39,5 +39,5 @@ index 2001c09761d9..ee3f9a4ad0d7 100644
    endif()
  
 -- 
-2.37.2
+2.43.0
 

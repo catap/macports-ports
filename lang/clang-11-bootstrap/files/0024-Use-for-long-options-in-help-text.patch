@@ -1,4 +1,4 @@
-From 453bcd6038730cf1da7d9b988574513cadb99cf1 Mon Sep 17 00:00:00 2001
+From 6c6ae5e88407a3388f5652148724f9fe35c1d7ed Mon Sep 17 00:00:00 2001
 From: "Kirill A. Korinsky" <kirill@korins.ky>
 Date: Wed, 17 Aug 2022 15:14:31 +0200
 Subject: [PATCH] Use "--" for long options in --help text
@@ -9,10 +9,10 @@ See: https://reviews.llvm.org/D92310
  llvm/tools/llvm-objdump/llvm-objdump.cpp | 16 ++++++++--------
  2 files changed, 20 insertions(+), 20 deletions(-)
 
-diff --git a/llvm/tools/llvm-objdump/MachODump.cpp b/llvm/tools/llvm-objdump/MachODump.cpp
+diff --git llvm/tools/llvm-objdump/MachODump.cpp llvm/tools/llvm-objdump/MachODump.cpp
 index 6d46496ecd4e..a50de47b97f5 100644
---- a/llvm/tools/llvm-objdump/MachODump.cpp
-+++ b/llvm/tools/llvm-objdump/MachODump.cpp
+--- llvm/tools/llvm-objdump/MachODump.cpp
++++ llvm/tools/llvm-objdump/MachODump.cpp
 @@ -107,70 +107,70 @@ static cl::opt<bool> NoLeadingHeaders("no-leading-headers",
  
  cl::opt<bool> objdump::UniversalHeaders(
@@ -96,10 +96,10 @@ index 6d46496ecd4e..a50de47b97f5 100644
      cl::cat(MachOCat));
  
  static cl::list<std::string>
-diff --git a/llvm/tools/llvm-objdump/llvm-objdump.cpp b/llvm/tools/llvm-objdump/llvm-objdump.cpp
+diff --git llvm/tools/llvm-objdump/llvm-objdump.cpp llvm/tools/llvm-objdump/llvm-objdump.cpp
 index 320bbb5d358b..c5378872fef5 100644
---- a/llvm/tools/llvm-objdump/llvm-objdump.cpp
-+++ b/llvm/tools/llvm-objdump/llvm-objdump.cpp
+--- llvm/tools/llvm-objdump/llvm-objdump.cpp
++++ llvm/tools/llvm-objdump/llvm-objdump.cpp
 @@ -101,7 +101,7 @@ static cl::alias AllHeadersShort("x", cl::desc("Alias for --all-headers"),
  static cl::opt<std::string>
      ArchName("arch-name",
@@ -145,5 +145,5 @@ index 320bbb5d358b..c5378872fef5 100644
  cl::opt<bool> objdump::UnwindInfo("unwind-info",
                                    cl::desc("Display unwind information"),
 -- 
-2.37.2
+2.43.0
 

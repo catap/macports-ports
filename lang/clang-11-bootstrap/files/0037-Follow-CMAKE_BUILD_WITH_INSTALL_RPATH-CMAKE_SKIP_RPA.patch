@@ -1,0 +1,26 @@
+From dab69e377cfd38202df1caa911155499c06576c9 Mon Sep 17 00:00:00 2001
+From: "Kirill A. Korinsky" <kirill@korins.ky>
+Date: Mon, 1 May 2023 22:58:43 +0200
+Subject: [PATCH] Follow `CMAKE_BUILD_WITH_INSTALL_RPATH`, `CMAKE_SKIP_RPATH`
+ or `CMAKE_SKIP_INSTALL_RPATH`
+
+---
+ llvm/cmake/modules/AddLLVM.cmake | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git llvm/cmake/modules/AddLLVM.cmake llvm/cmake/modules/AddLLVM.cmake
+index b74adc11ade9..c7bea87b70ed 100644
+--- llvm/cmake/modules/AddLLVM.cmake
++++ llvm/cmake/modules/AddLLVM.cmake
+@@ -2052,7 +2052,7 @@ function(llvm_codesign name)
+ endfunction()
+ 
+ function(llvm_setup_rpath name)
+-  if(CMAKE_INSTALL_RPATH)
++  if(CMAKE_INSTALL_RPATH OR NOT CMAKE_BUILD_WITH_INSTALL_RPATH OR CMAKE_SKIP_INSTALL_RPATH OR CMAKE_SKIP_RPATH)
+     return()
+   endif()
+ 
+-- 
+2.43.0
+

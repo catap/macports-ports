@@ -1,4 +1,4 @@
-From 884ca9bc09df5859489abba1741fdb7d16cd4c7a Mon Sep 17 00:00:00 2001
+From 99d600370cbe050f9f438836e4e5508831ba453d Mon Sep 17 00:00:00 2001
 From: David Fang <fang@csl.cornell.edu>
 Date: Wed, 15 Jan 2014 21:27:34 -0800
 Subject: [PATCH] implement atomic<> using mutex/lock_guard for 64b ops on 32b
@@ -10,11 +10,11 @@ Subject: [PATCH] implement atomic<> using mutex/lock_guard for 64b ops on 32b
  2 files changed, 286 insertions(+)
  create mode 100644 libcxx/include/__atomic_locked
 
-diff --git a/libcxx/include/__atomic_locked b/libcxx/include/__atomic_locked
+diff --git libcxx/include/__atomic_locked libcxx/include/__atomic_locked
 new file mode 100644
 index 000000000000..f10dd747e878
 --- /dev/null
-+++ b/libcxx/include/__atomic_locked
++++ libcxx/include/__atomic_locked
 @@ -0,0 +1,240 @@
 +// -*- C++ -*-
 +//===--------------------------- __atomic_locked --------------------------===//
@@ -256,10 +256,10 @@ index 000000000000..f10dd747e878
 +_LIBCPP_END_NAMESPACE_STD
 +
 +#endif  // _LIBCPP_ATOMIC_LOCKED
-diff --git a/libcxx/include/atomic b/libcxx/include/atomic
+diff --git libcxx/include/atomic libcxx/include/atomic
 index 9c2898653788..c053b2e6ec11 100644
---- a/libcxx/include/atomic
-+++ b/libcxx/include/atomic
+--- libcxx/include/atomic
++++ libcxx/include/atomic
 @@ -2785,4 +2785,50 @@ typedef atomic<__libcpp_unsigned_lock_free> atomic_unsigned_lock_free;
  
  _LIBCPP_END_NAMESPACE_STD
@@ -312,5 +312,5 @@ index 9c2898653788..c053b2e6ec11 100644
 +
  #endif  // _LIBCPP_ATOMIC
 -- 
-2.37.2
+2.43.0
 

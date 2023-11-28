@@ -1,4 +1,4 @@
-From 74dda39256362d98a74fefeddfea344b9d34b681 Mon Sep 17 00:00:00 2001
+From 039f7f08ab5f1311d2161f9d7452c26ea185557c Mon Sep 17 00:00:00 2001
 From: "Kirill A. Korinsky" <kirill@korins.ky>
 Date: Wed, 17 Aug 2022 15:11:27 +0200
 Subject: [PATCH] disable DirectoryWatcher when builds by GCC
@@ -7,10 +7,10 @@ Subject: [PATCH] disable DirectoryWatcher when builds by GCC
  clang/lib/DirectoryWatcher/CMakeLists.txt | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/clang/lib/DirectoryWatcher/CMakeLists.txt b/clang/lib/DirectoryWatcher/CMakeLists.txt
+diff --git clang/lib/DirectoryWatcher/CMakeLists.txt clang/lib/DirectoryWatcher/CMakeLists.txt
 index 5a8796982113..0a0111c3829d 100644
---- a/clang/lib/DirectoryWatcher/CMakeLists.txt
-+++ b/clang/lib/DirectoryWatcher/CMakeLists.txt
+--- clang/lib/DirectoryWatcher/CMakeLists.txt
++++ clang/lib/DirectoryWatcher/CMakeLists.txt
 @@ -5,7 +5,7 @@ set(LLVM_LINK_COMPONENTS support)
  set(DIRECTORY_WATCHER_SOURCES DirectoryScanner.cpp)
  set(DIRECTORY_WATCHER_LINK_LIBS "")
@@ -21,5 +21,5 @@ index 5a8796982113..0a0111c3829d 100644
    if(HAVE_CORESERVICES)
      list(APPEND DIRECTORY_WATCHER_SOURCES mac/DirectoryWatcher-mac.cpp)
 -- 
-2.37.2
+2.43.0
 

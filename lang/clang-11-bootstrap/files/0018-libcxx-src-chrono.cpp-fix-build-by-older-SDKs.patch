@@ -1,4 +1,4 @@
-From 242d08207030270d0f3a6bf96c0d6835173bd2b1 Mon Sep 17 00:00:00 2001
+From 429b8a248a14e33031fb63b294fa18b3af8a3522 Mon Sep 17 00:00:00 2001
 From: "Kirill A. Korinsky" <kirill@korins.ky>
 Date: Wed, 17 Aug 2022 14:09:22 +0200
 Subject: [PATCH] libcxx/src/chrono.cpp: fix build by older SDKs
@@ -8,10 +8,10 @@ See: https://github.com/llvm/llvm-project/commit/babd3aefc9193b44ad0620a2cfd63eb
  libcxx/src/chrono.cpp | 62 +++++++++++++++++++++++++++++++++++++++++++
  1 file changed, 62 insertions(+)
 
-diff --git a/libcxx/src/chrono.cpp b/libcxx/src/chrono.cpp
+diff --git libcxx/src/chrono.cpp libcxx/src/chrono.cpp
 index f0a5d50ddf77..c7fbd90f59e5 100644
---- a/libcxx/src/chrono.cpp
-+++ b/libcxx/src/chrono.cpp
+--- libcxx/src/chrono.cpp
++++ libcxx/src/chrono.cpp
 @@ -33,6 +33,11 @@
  #  endif // !defined(CLOCK_REALTIME)
  #endif // defined(_LIBCPP_WIN32API)
@@ -96,5 +96,5 @@ index f0a5d50ddf77..c7fbd90f59e5 100644
  #elif defined(_LIBCPP_WIN32API)
  
 -- 
-2.37.2
+2.43.0
 

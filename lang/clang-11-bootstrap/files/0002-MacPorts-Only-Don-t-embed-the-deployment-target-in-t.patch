@@ -11,10 +11,10 @@ Signed-off-by: Jeremy Huddleston Sequoia <jeremyhu@apple.com>
  llvm/lib/CodeGen/AsmPrinter/AsmPrinter.cpp | 6 ++++--
  1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/llvm/lib/CodeGen/AsmPrinter/AsmPrinter.cpp b/llvm/lib/CodeGen/AsmPrinter/AsmPrinter.cpp
+diff --git llvm/lib/CodeGen/AsmPrinter/AsmPrinter.cpp llvm/lib/CodeGen/AsmPrinter/AsmPrinter.cpp
 index c7eb0257d71b..75c4a19bf9f1 100644
---- a/llvm/lib/CodeGen/AsmPrinter/AsmPrinter.cpp
-+++ b/llvm/lib/CodeGen/AsmPrinter/AsmPrinter.cpp
+--- llvm/lib/CodeGen/AsmPrinter/AsmPrinter.cpp
++++ llvm/lib/CodeGen/AsmPrinter/AsmPrinter.cpp
 @@ -269,8 +269,10 @@ bool AsmPrinter::doInitialization(Module &M) {
    // alternative is duplicated code in each of the target asm printers that
    // use the directive, where it would need the same conditionalization
@@ -29,5 +29,5 @@ index c7eb0257d71b..75c4a19bf9f1 100644
    // Allow the target to emit any magic that it wants at the start of the file.
    emitStartOfAsmFile(M);
 -- 
-2.37.2
+2.43.0
 

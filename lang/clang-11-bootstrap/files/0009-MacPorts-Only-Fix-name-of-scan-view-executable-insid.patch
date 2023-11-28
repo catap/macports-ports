@@ -1,4 +1,4 @@
-From 1bb478c260682b6597f7b7f84ce529ef2e7be4e3 Mon Sep 17 00:00:00 2001
+From 62b8ede307d8dcd43f8d34dea9c66039fb277df9 Mon Sep 17 00:00:00 2001
 From: Jeremy Huddleston Sequoia <jeremyhu@apple.com>
 Date: Sat, 17 Jan 2015 17:55:27 -0800
 Subject: [PATCH] MacPorts Only: Fix name of scan-view executable inside
@@ -9,10 +9,10 @@ http://trac.macports.org/ticket/35006
  clang/tools/scan-build/bin/scan-build | 2 ++
  1 file changed, 2 insertions(+)
 
-diff --git a/clang/tools/scan-build/bin/scan-build b/clang/tools/scan-build/bin/scan-build
+diff --git clang/tools/scan-build/bin/scan-build clang/tools/scan-build/bin/scan-build
 index 11334a0b9626..e4194b6a762c 100755
---- a/clang/tools/scan-build/bin/scan-build
-+++ b/clang/tools/scan-build/bin/scan-build
+--- clang/tools/scan-build/bin/scan-build
++++ clang/tools/scan-build/bin/scan-build
 @@ -969,6 +969,8 @@ sub Finalize {
        if ($Options{ViewResults} and -r "$Options{OutputDir}/index.html") {
          Diag "Viewing analysis results in '$Options{OutputDir}' using scan-view.\n";
@@ -23,5 +23,5 @@ index 11334a0b9626..e4194b6a762c 100755
          if (! -x $ScanView) { $ScanView = Cwd::realpath("$RealBin/../../scan-view/bin/scan-view"); }
          if (! -x $ScanView) { $ScanView = `which scan-view`; chomp $ScanView; }
 -- 
-2.37.2
+2.43.0
 

@@ -1,4 +1,4 @@
-From f789d7d5a40bcd20d344a9a805afdaa1a82a7454 Mon Sep 17 00:00:00 2001
+From 442cec52c05858765e91fe474dffebc8c6220548 Mon Sep 17 00:00:00 2001
 From: Jeremy Huddleston Sequoia <jeremyhu@apple.com>
 Date: Thu, 4 Jul 2019 13:23:19 -0700
 Subject: [PATCH] Only call setpriority(PRIO_DARWIN_THREAD, 0, PRIO_DARWIN_BG)
@@ -8,13 +8,34 @@ Tiger and earlier versions of darwin do not support this.
 
 Signed-off-by: Jeremy Huddleston Sequoia <jeremyhu@apple.com>
 ---
- llvm/lib/Support/Unix/Threading.inc | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ llvm/lib/Support/CrashRecoveryContext.cpp | 4 ++--
+ llvm/lib/Support/Unix/Threading.inc       | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/llvm/lib/Support/Unix/Threading.inc b/llvm/lib/Support/Unix/Threading.inc
+diff --git llvm/lib/Support/CrashRecoveryContext.cpp llvm/lib/Support/CrashRecoveryContext.cpp
+index ec7d7d641dce..d19a8d1aea82 100644
+--- llvm/lib/Support/CrashRecoveryContext.cpp
++++ llvm/lib/Support/CrashRecoveryContext.cpp
+@@ -438,13 +438,13 @@ void CrashRecoveryContext::HandleExit(int RetCode) {
+ 
+ // FIXME: Portability.
+ static void setThreadBackgroundPriority() {
+-#ifdef __APPLE__
++#if defined(__APPLE__) && defined(PRIO_DARWIN_THREAD) && defined(PRIO_DARWIN_BG)
+   setpriority(PRIO_DARWIN_THREAD, 0, PRIO_DARWIN_BG);
+ #endif
+ }
+ 
+ static bool hasThreadBackgroundPriority() {
+-#ifdef __APPLE__
++#if defined(__APPLE__) && defined(PRIO_DARWIN_THREAD)
+   return getpriority(PRIO_DARWIN_THREAD, 0) == 1;
+ #else
+   return false;
+diff --git llvm/lib/Support/Unix/Threading.inc llvm/lib/Support/Unix/Threading.inc
 index 78ef46cd1a4c..51a39ec755ef 100644
---- a/llvm/lib/Support/Unix/Threading.inc
-+++ b/llvm/lib/Support/Unix/Threading.inc
+--- llvm/lib/Support/Unix/Threading.inc
++++ llvm/lib/Support/Unix/Threading.inc
 @@ -258,7 +258,7 @@ SetThreadPriorityResult llvm::set_thread_priority(ThreadPriority Priority) {
               &priority)
               ? SetThreadPriorityResult::SUCCESS
@@ -25,5 +46,5 @@ index 78ef46cd1a4c..51a39ec755ef 100644
    // When setting a thread into background state the scheduling priority is set
    // to lowest value, disk and network IO are throttled. Network IO will be
 -- 
-2.37.2
+2.43.0
 

@@ -1,4 +1,4 @@
-From 7bcddfb1ac8f9786f02b0313304e0c595f369b22 Mon Sep 17 00:00:00 2001
+From 5154731c91e0d4e63fe96f77131489a69a524bf0 Mon Sep 17 00:00:00 2001
 From: "Kirill A. Korinsky" <kirill@korins.ky>
 Date: Wed, 17 Aug 2022 15:23:05 +0200
 Subject: [PATCH] fix building on 10.10 by GCC 10
@@ -10,10 +10,10 @@ be compiled by gcc 10; redefine in properly.
  llvm/tools/dsymutil/SymbolMap.cpp | 10 ++++++++++
  2 files changed, 20 insertions(+)
 
-diff --git a/llvm/tools/dsymutil/CFBundle.cpp b/llvm/tools/dsymutil/CFBundle.cpp
+diff --git llvm/tools/dsymutil/CFBundle.cpp llvm/tools/dsymutil/CFBundle.cpp
 index 0625afb18ab6..856bd36a727a 100644
---- a/llvm/tools/dsymutil/CFBundle.cpp
-+++ b/llvm/tools/dsymutil/CFBundle.cpp
+--- llvm/tools/dsymutil/CFBundle.cpp
++++ llvm/tools/dsymutil/CFBundle.cpp
 @@ -9,6 +9,16 @@
  #include "CFBundle.h"
  
@@ -31,10 +31,10 @@ index 0625afb18ab6..856bd36a727a 100644
  #include "llvm/Support/FileSystem.h"
  #include "llvm/Support/Path.h"
  #include "llvm/Support/raw_ostream.h"
-diff --git a/llvm/tools/dsymutil/SymbolMap.cpp b/llvm/tools/dsymutil/SymbolMap.cpp
+diff --git llvm/tools/dsymutil/SymbolMap.cpp llvm/tools/dsymutil/SymbolMap.cpp
 index 0a17451e5809..50977d18865f 100644
---- a/llvm/tools/dsymutil/SymbolMap.cpp
-+++ b/llvm/tools/dsymutil/SymbolMap.cpp
+--- llvm/tools/dsymutil/SymbolMap.cpp
++++ llvm/tools/dsymutil/SymbolMap.cpp
 @@ -15,6 +15,16 @@
  #include "llvm/Support/WithColor.h"
  
@@ -53,5 +53,5 @@ index 0a17451e5809..50977d18865f 100644
  #include <uuid/uuid.h>
  
 -- 
-2.37.2
+2.43.0
 
