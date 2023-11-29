@@ -156,6 +156,18 @@ configure.pre_args-delete \
 configure.pre_args-delete \
                     -DCMAKE_INSTALL_NAME_DIR="${cmake.install_prefix}/lib"
 
+configure.args-append \
+                    -DCLANG_ENABLE_BOOTSTRAP=ON
+
+set clang_bootstrap_passthrough "CMAKE_SYSTEM_PREFIX_PATH\;CMAKE_BUILD_WITH_INSTALL_RPATH"
+
+proc add_configure_args {name value} {
+    global clang_bootstrap_passthrough configure
+
+    append clang_bootstrap_passthrough "[shellescape ${name}]"
+    configure.args-append   "-D${name}=[shellescape ${value}]"
+}
+
 platform darwin {
     if {${os.major} == 14} {
         patchfiles-append \
@@ -166,15 +178,13 @@ platform darwin {
         # xpc.h available 10.7 but doesn't support nullable features
         # xpc.h works currently on 10.8+
         # toggle enabled in https://reviews.llvm.org/D59808
-        configure.args-append \
-                    -DCLANGD_BUILD_XPC=OFF
+        add_configure_args  CLANGD_BUILD_XPC OFF
     }
 
     if {${os.major} <= 10} {
         # avoid need for thread_local_storage
-        configure.args-append \
-                    -DCLANG_ENABLE_CLANGD=OFF \
-                    -DLLVM_ENABLE_BACKTRACES=OFF
+        add_configure_args  CLANG_ENABLE_CLANGD OFF
+        add_configure_args  DLLVM_ENABLE_BACKTRACES OFF
 
         # reexported_symbols_list is available on 10.7+ only, used by libcxx
         patchfiles-append \
@@ -197,52 +207,46 @@ platform darwin {
     }
 }
 
-configure.args-append \
-                    -DCLANG_ENABLE_ARCMT=OFF \
-                    -DCLANG_ENABLE_STATIC_ANALYZER=OFF \
-                    -DCOMPILER_RT_ENABLE_IOS=OFF \
-                    -DCOMPILER_RT_ENABLE_TVOS=OFF \
-                    -DCOMPILER_RT_ENABLE_WATCHOS=OFF \
-                    -DDARWIN_PREFER_PUBLIC_SDK=ON \
-                    -DLLVM_BINDINGS_LIST=none \
-                    -DLLVM_BUILD_UTILS=OFF \
-                    -DLLVM_ENABLE_LIBEDIT=OFF \
-                    -DLLVM_ENABLE_LIBXML2=OFF \
-                    -DLLVM_ENABLE_PROJECTS="clang\;compiler-rt" \
-                    -DLLVM_ENABLE_TERMINFO=OFF \
-                    -DLLVM_ENABLE_ZLIB=OFF \
-                    -DLLVM_INCLUDE_BENCHMARKS=OFF \
-                    -DLLVM_INCLUDE_DOCS=OFF \
-                    -DLLVM_INCLUDE_EXAMPLES=OFF \
-                    -DLLVM_INCLUDE_GO_TESTS=OFF \
-                    -DLLVM_INCLUDE_TESTS=OFF \
-                    -DLLVM_INCLUDE_UTILS=OFF \
-                    -DPYTHON_EXECUTABLE=${prefix}/libexec/python27-bootstrap/bin/python2.7
+add_configure_args  CLANG_ENABLE_ARCMT OFF
+add_configure_args  CLANG_ENABLE_STATIC_ANALYZER OFF
+add_configure_args  COMPILER_RT_ENABLE_IOS OFF
+add_configure_args  COMPILER_RT_ENABLE_TVOS OFF
+add_configure_args  COMPILER_RT_ENABLE_WATCHOS OFF
+add_configure_args  DARWIN_PREFER_PUBLIC_SDK ON
+add_configure_args  LLVM_BINDINGS_LIST none
+add_configure_args  LLVM_BUILD_UTILS OFF
+add_configure_args  LLVM_ENABLE_LIBEDIT OFF
+add_configure_args  LLVM_ENABLE_LIBXML2 OFF
+add_configure_args  LLVM_ENABLE_PROJECTS "clang;compiler-rt"
+add_configure_args  LLVM_ENABLE_TERMINFO OFF
+add_configure_args  LLVM_ENABLE_ZLIB OFF
+add_configure_args  LLVM_INCLUDE_BENCHMARKS OFF
+add_configure_args  LLVM_INCLUDE_DOCS OFF
+add_configure_args  LLVM_INCLUDE_EXAMPLES OFF
+add_configure_args  LLVM_INCLUDE_GO_TESTS OFF
+add_configure_args  LLVM_INCLUDE_TESTS OFF
+add_configure_args  LLVM_INCLUDE_UTILS OFF
+add_configure_args  PYTHON_EXECUTABLE ${prefix}/libexec/python27-bootstrap/bin/python2.7
 
 if {${configure.build_arch} eq "arm64"} {
-    configure.args-append \
-                    -DLLVM_TARGETS_TO_BUILD="AArch64\;X86"
+    add_configure_args  LLVM_TARGETS_TO_BUILD "AArch64;X86"
 } else {
-    configure.args-append \
-                    -DLLVM_TARGETS_TO_BUILD=X86
+    add_configure_args  LLVM_TARGETS_TO_BUILD X86
 }
 
 if {${configure.sdkroot} ne ""} {
-    configure.args-append \
-                    -DDARWIN_osx_SYSROOT="${configure.sdkroot}" \
-                    -DDEFAULT_SYSROOT="${configure.sdkroot}"
+    add_configure_args  DARWIN_osx_SYSROOT "${configure.sdkroot}"
+    add_configure_args  DEFAULT_SYSROOT "${configure.sdkroot}"
 } else {
     # compiler-rt does a broad search for an SDK it likes, but this
     # search fails on older systems that don't have a MacOSX.sdk
-    configure.args-append \
-                    -DDARWIN_osx_SYSROOT=/
+    add_configure_args  DARWIN_osx_SYSROOT /
 }
 
 if {${os.major} <= 18} {
     # on systems that might build i386, we need atomic builtins
     # https://trac.macports.org/ticket/58712
-    configure.args-append \
-                    -DCOMPILER_RT_EXCLUDE_ATOMIC_BUILTIN=OFF
+    add_configure_args  COMPILER_RT_EXCLUDE_ATOMIC_BUILTIN OFF
 }
 
 if {${os.major} < 11} {
@@ -303,15 +307,13 @@ if {${os.platform} eq "darwin" && ${os.major} < 18} {
 
     # Profiling can't be build by GCC with unknown reason.
     # Some part of profiling is used by cc_kext also.
-    configure.args-append \
-                    -DCOMPILER_RT_BUILD_PROFILE=OFF \
-                    -DDARWIN_osx_SKIP_CC_KEXT=ON
+    add_configure_args  COMPILER_RT_BUILD_PROFILE OFF
+    add_configure_args  DARWIN_osx_SKIP_CC_KEXT ON
 
     # sanitizer_common is using os/trace.h which can't be build by GCC
     # Xray and Sanitizer forces to build sanitizer_common => disable both
-    configure.args-append \
-                    -DCOMPILER_RT_BUILD_SANITIZERS=OFF \
-                    -DCOMPILER_RT_BUILD_XRAY=OFF
+    add_configure_args  COMPILER_RT_BUILD_SANITIZERS OFF
+    add_configure_args  COMPILER_RT_BUILD_XRAY OFF
 
 }
 
@@ -374,6 +376,13 @@ if {${universal_possible} && [variant_isset universal]} {
 merger_arch_flag            yes
 merger_arch_compiler        yes
 merger_must_run_binaries    yes
+
+append  clang_bootstrap_passthrough "\;COMPILER_RT_TOOLCHAIN_ARCHES\;DARWIN_osx_BUILTIN_ALL_POSSIBLE_ARCHS"
+
+configure.args-append       -DCLANG_ENABLE_BOOTSTRAP=ON \
+                            -DCLANG_BOOTSTRAP_PASSTHROUGH="${clang_bootstrap_passthrough}"
+
+build.target                stage2
 
 post-destroot {
     system "ditto ${worksrcpath}/projects/libcxx/include ${destroot}${cmake.install_prefix}/include/c++/v1"
