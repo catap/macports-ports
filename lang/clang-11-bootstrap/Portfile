@@ -164,7 +164,7 @@ set clang_bootstrap_passthrough "CMAKE_SYSTEM_PREFIX_PATH\;CMAKE_BUILD_WITH_INST
 proc add_configure_args {name value} {
     global clang_bootstrap_passthrough configure
 
-    append clang_bootstrap_passthrough "[shellescape ${name}]"
+    append clang_bootstrap_passthrough "[shellescape ;${name}]"
     configure.args-append   "-D${name}=[shellescape ${value}]"
 }
 
