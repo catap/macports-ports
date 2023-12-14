@@ -4,11 +4,11 @@ PortSystem          1.0
 PortGroup           github 1.0
 PortGroup           muniversal 1.0
 
-github.setup        ivmai bdwgc 8.2.4 v
+github.setup        ivmai bdwgc da069190905872d02a832357016008925c9ba3dd
 revision            0
-checksums           rmd160  33219535021bf392a23585ca99f0a5f6561a8cb0 \
-                    sha256  3d0d3cdbe077403d3106bb40f0cbb563413d6efdbb2a7e1cd6886595dec48fc2 \
-                    size    1210929
+checksums           rmd160  94a7e1d95fddd0c32a999f7724f3fc5dd24d1052 \
+                    sha256  cae3f4e9bfd62ab70e616266a5df38d24718c934e836a5221584304f384d7879 \
+                    size    829651
 
 name                boehmgc
 
@@ -26,7 +26,9 @@ long_description \
     by a number of programming language implementations that use C as \
     intermediate code.
 
-github.tarball_from releases
+use_autoreconf      yes
+
+# github.tarball_from releases
 distname            gc-${version}
 
 depends_build-append \
