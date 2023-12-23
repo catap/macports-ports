@@ -1,0 +1,13 @@
+diff --git o/makefile o/makefile
+index db1e29233..0d55f52dd 100644
+--- o/makefile
++++ o/makefile
+@@ -71,7 +71,7 @@ boot.h: boot.ini
+ 	rm $*.c
+ 
+ $(DPP):	../bin/dpp.c
+-	${CC} ${DEFS} -o $@ $<
++	${CC} $(CFLAGS) $(LDFLAGS) ${DEFS} -o $@ $<
+ 
+ new_init.c: ${INI_FILES}
+ 	echo '#include "make-init.h"' > $@

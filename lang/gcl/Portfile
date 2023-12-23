@@ -5,10 +5,10 @@ PortGroup           conflicts_build 1.0
 
 name                gcl
 version             2.6.14
-revision            0
+revision            1
 categories          lang
 license             GPL-2+
-platforms           darwin
+
 maintainers         {@catap korins.ky:kirill} openmaintainer
 
 description         GNU Common Lisp
@@ -20,14 +20,16 @@ homepage            https://www.gnu.org/software/gcl
 
 # arm64 requires future works
 # See: https://savannah.gnu.org/bugs/index.php?63875
-# i386/ppc seems to be broken for a while. Seems that only x86_64
+# i386/ppc seems to be broken for a while. That makes only x86_64
 supported_archs     x86_64
 
 depends_lib         port:gettext \
                     port:gmp \
                     port:readline
 
-master_sites        gnu
+if {${name} eq ${subport}} {
+    master_sites    gnu
+}
 
 extract.rename      yes
 
@@ -36,12 +38,12 @@ checksums           rmd160  d64bb58a38ce45d6c4cf67cec4dff1dc52197a55 \
                     size    11725385
 
 patchfiles          dont-override-CC-or-MACOSX_DEPLOYMENT_TARGET.patch \
-                    fix-memory-corruption-on-macOS.patch \
+                    vfork-posix_spawn-in-vsystem.patch \
+                    use-CFLAGS-and-LDFLAGS-at-dpp-target.patch \
                     old-macOS.patch
 
-
 conflicts_build-append \
-                    ${name}
+                    gcl gcl-devel
 
 # checking for required object alignment... configure: error: Cannot find object alignent
 universal_variant   no
@@ -61,6 +63,48 @@ configure.args-append ac_cv_path_EMACS=
 # anyway, we need to provide the right path to default.el
 post-configure {
     reinplace "s|EMACS_DEFAULT_EL=|EMACS_DEFAULT_EL=${prefix}/etc/default.el|g" makedefs makedefc
+}
+
+# When it builds on arm64, it uses arm64 target which isn't supported yet
+configure.args-append \
+                    --host=${configure.build_arch}-apple-${os.platform}${os.version} \
+                    --build=${configure.build_arch}-apple-${os.platform}${os.version} \
+                    --target=${configure.build_arch}-apple-${os.platform}${os.version}
+
+subport gcl-devel {
+    PortGroup       cgit 1.0
+    PortGroup       legacysupport 1.1
+
+    cgit.setup      git.savannah.gnu.org/cgit gcl ce9ad278ffa8e08b13a3ffd0a2b89760835dc4f1
+    version         20240129
+    revision        0
+
+    checksums       rmd160  81bfd0ee8b483a0dd1366c13b68fddc19cc20881 \
+                    sha256  51774300c2275db6f685ea0c1bc55ba4b467f6511ef8d61f74fdc9a672613241 \
+                    size    7245385
+
+    # cleanup all patches
+    patchfiles
+
+    worksrcdir      ${worksrcdir}/gcl
+
+    configure.args-append \
+                    --enable-dynsysgmp
+
+    # ld: unknown option: -no_pie
+    compiler.blacklist-append *gcc-3.* *gcc-4.*
+
+    if {${build_arch} eq "i386"} {
+        # checking for required object alignment...
+        # ld: illegal text-relocation to ___stack_chk_guard in /usr/lib/libSystem.dylib from _emsg in ...
+        compiler.blacklist-append   *clang*
+        # I must ban libc++ because it will dismiss gcc
+        configure.cxx_stdlib        libstdc++
+
+        # Undefined symbols for architecture i386:
+        #   "__mcleanup", referenced from:
+        configure.args-append       --disable-gprof
+    }
 }
 
 # /usr/bin/libtool: object: ... malformed object (unknown load command 1)
