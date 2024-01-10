@@ -4,14 +4,14 @@ PortSystem          1.0
 PortGroup           github 1.0
 PortGroup           common_lisp 1.0
 
-github.setup        pcostanza closer-mop fc9ae24408cf83428d244bb9f0a0a0bac4dfca9e
+github.setup        pcostanza closer-mop f8e669d47ac0b6c57c920bffe23c18f367439995
 name                cl-closer-mop
-version             20231127
+version             20240109
 revision            0
 
-checksums           rmd160  be92478dc32d7bc8edb3e450d8581913340c71f7 \
-                    sha256  1d9ba1924db062f9bfc631d50809f65d939f66f264c6c9d9e8bb37faf210e328 \
-                    size    23123
+checksums           rmd160  05d7279f7b6ed11ee6c0712a74febd3c17d9f67b \
+                    sha256  01dddfca136c0f9d2e6543ca8fc2947b43faea001347264179fffc6ddc1762c2 \
+                    size    23140
 
 categories-append   devel
 maintainers         {@catap korins.ky:kirill} openmaintainer
