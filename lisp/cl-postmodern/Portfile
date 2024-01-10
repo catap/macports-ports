@@ -4,13 +4,13 @@ PortSystem          1.0
 PortGroup           github 1.0
 PortGroup           common_lisp 1.0
 
-github.setup        marijnh Postmodern 1.33.10 v
+github.setup        marijnh Postmodern 1.33.11 v
 name                cl-postmodern
 revision            0
 
-checksums           rmd160  6281b0af21d94966716bd246364be72bfe98f6b9 \
-                    sha256  0cef13d7bc3218a6a5ddd7b451b33a616c770332412e56d4b1c0a9e451bc1d29 \
-                    size    692675
+checksums           rmd160  108c77a115c1351c57495cb968f2bc0eb889830c \
+                    sha256  1c41c0a7162d663023d25e6eee1158d6e79accf3ed09837e7ea93334cf9f1926 \
+                    size    700815
 
 categories-append   devel
 maintainers         {@catap korins.ky:kirill} openmaintainer
