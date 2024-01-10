@@ -4,14 +4,14 @@ PortSystem          1.0
 PortGroup           github 1.0
 PortGroup           common_lisp 1.0
 
-github.setup        cffi cffi 53ea94d5b4e0b4b8f636ad021dda76793f0a7af4
+github.setup        cffi cffi 6b746314eaa49fbcdbb5e73bba38aa9b659c6f32
 name                cl-cffi
-version             0.24.1.20231011
+version             0.24.1.20240103
 revision            0
 
-checksums           rmd160  abe1c57e71b618d187e257726d7e717dad0614f7 \
-                    sha256  9d1a315331bc9ab86968edeba28d2c64c5366fb7332415a51436f2db9e09b607 \
-                    size    257618
+checksums           rmd160  dd2ea7e2ea074b942755a2150f37a43d50d090bc \
+                    sha256  de4e0023dfaf3c8e45da90fa7134fbbb02b77d5e3f60b12db503e47b8553a4cc \
+                    size    257726
 
 categories-append   devel
 maintainers         {@catap korins.ky:kirill} openmaintainer
