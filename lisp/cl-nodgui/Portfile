@@ -4,14 +4,14 @@ PortSystem          1.0
 PortGroup           codeberg 1.0
 PortGroup           common_lisp 1.0
 
-codeberg.setup      cage nodgui 96af1af4a0205ea6f7f0af8b6d9da5f180b39d2a
+codeberg.setup      cage nodgui c15de01a76f8361343bebb251fb943864112c108
 name                cl-nodgui
-version             20231206
+version             20231225
 revision            0
 
-checksums           rmd160  bdcaa2d2b263545beed0a2f434a43fad069cb593 \
-                    sha256  df8f976801f3b0305fc3b85460465adb1a9e882d4c28e45c0554d972dccbfb13 \
-                    size    200014
+checksums           rmd160  4ec844af5369d669a54b9e01dadffad97710aa18 \
+                    sha256  99234928c2fdc4b5fc137cc6a80c32e65814238ee72e7cdfb20a24720f643b65 \
+                    size    200362
 
 categories-append   devel
 maintainers         {@catap korins.ky:kirill} openmaintainer
@@ -33,6 +33,7 @@ depends_lib-append  port:cl-alexandria \
                     port:cl-pngload \
                     port:cl-ppcre \
                     port:cl-ppcre-unicode \
-                    port:cl-unicode
+                    port:cl-unicode \
+                    port:cl-zpng
 
 common_lisp.threads yes
