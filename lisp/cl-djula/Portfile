@@ -4,14 +4,14 @@ PortSystem              1.0
 PortGroup               github 1.0
 PortGroup               common_lisp 1.0
 
-github.setup            mmontone djula 0c80535860e81b8b29c27f9405ecce6e7ebce1d0
+github.setup            mmontone djula 477b1026330342295268ad3a5bb5198660363114
 name                    cl-djula
-version                 20231207
+version                 20240108
 revision                0
 
-checksums               rmd160  8ec676ba472959c6d7ae93a6786392a6ac09242e \
-                        sha256  8d3e2df21b6245e402ed23a74aab98a0bd02d3a2e667a6b40928fe3ee98e1c60 \
-                        size    128066
+checksums               rmd160  8bbc69dd8a65a3deb2b5384be81785bff924f479 \
+                        sha256  0df43c27dbd403dea9dee9d5e559828dcca3730fc3888264e165c9836367230a \
+                        size    128535
 
 categories-append       www devel
 maintainers             {@catap korins.ky:kirill} openmaintainer
