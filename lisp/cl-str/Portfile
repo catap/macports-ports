@@ -4,15 +4,12 @@ PortSystem              1.0
 PortGroup               github 1.0
 PortGroup               common_lisp 1.0
 
-github.setup            vindarel cl-str c98881810bdfc2cffd914dee2f83caa892d6161e
-# The next release will be 0.20 -> save to include dayte this way
-# See: https://github.com/vindarel/cl-str/issues/107
-version                 0.19.20231207
+github.setup            vindarel cl-str 0.21
 revision                0
 
-checksums               rmd160  00b30b960e8cfdb278417c385b9ef47f67cf8b6d \
-                        sha256  b759deac344671c7edd61f95ec5ea2b85ec7ebabb3c595a959914212a43e3e4a \
-                        size    25697
+checksums               rmd160  0c2f1e464324904cd078eba6d6b4810ed86be417 \
+                        sha256  4b288236c9f6eda17dca3000cef0a369f7388b7bdbd0209c8db57807f7143325 \
+                        size    25684
 
 categories-append       devel
 maintainers             {@catap korins.ky:kirill} openmaintainer
